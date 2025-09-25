@@ -405,7 +405,7 @@ export default function Home() {
         <div className="bg-white border-b border-gray-200">
           <div className="max-w-7xl mx-auto px-4 py-4">
             <div className="flex flex-wrap gap-2">
-              {Object.entries(availableModels).flatMap(([provider, models]) =>
+              {Object.entries(availableModels).flatMap(([, models]) =>
                 models.map(model => (
                   <button
                     key={model.id}
