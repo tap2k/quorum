@@ -189,15 +189,15 @@ export default function Home() {
       systemPrompt,
       temperature,
       selectedModels,
-      exportedAt: new Date().toISOString(),
-      version: '1.0'
+      synthesisModel,
+      exportedAt: new Date().toISOString()
     };
 
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `quorum-conversation-${new Date().toISOString().split('T')[0]}.json`;
+    a.download = `quorum-${new Date().toISOString().split('T')[0]}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -212,10 +212,12 @@ export default function Home() {
     reader.onload = (e) => {
       try {
         const data = JSON.parse(e.target.result);
+        // Import whatever fields are available
         if (data.messages) setMessages(data.messages);
         if (data.systemPrompt) setSystemPrompt(data.systemPrompt);
         if (data.temperature !== undefined) setTemperature(data.temperature);
         if (data.selectedModels) setSelectedModels(data.selectedModels);
+        if (data.synthesisModel) setSynthesisModel(data.synthesisModel);
         alert('Conversation imported successfully!');
       } catch (error) {
         alert('Failed to import conversation. Invalid file format.');
