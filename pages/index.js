@@ -7,7 +7,8 @@ import {
   Cog6ToothIcon,
   TrashIcon,
   ExclamationCircleIcon,
-  ArrowRightIcon
+  ArrowRightIcon,
+  KeyIcon
 } from '@heroicons/react/24/outline';
 
 export default function Home() {
@@ -17,15 +18,43 @@ export default function Home() {
   const [systemPrompt, setSystemPrompt] = useState('You are a helpful assistant.');
   const [isLoading, setIsLoading] = useState(false);
   const [showSystemPrompt, setShowSystemPrompt] = useState(false);
+  const [showApiKeys, setShowApiKeys] = useState(false);
   const [temperature, setTemperature] = useState(0.7);
   const [synthesisModel, setSynthesisModel] = useState('gemini-2.5-flash');
+  const [apiKeys, setApiKeys] = useState({
+    ANTHROPIC_API_KEY: '',
+    OPENAI_API_KEY: '',
+    GOOGLE_API_KEY: '',
+    XAI_API_KEY: '',
+    DEEPINFRA_API_KEY: ''
+  });
   const messagesEndRef = useRef(null);
 
+  // Always show all models - backend will handle authorization
   const availableModels = getAvailableModels();
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  // Load API keys from localStorage on mount
+  useEffect(() => {
+    const savedKeys = localStorage.getItem('quorum_api_keys');
+    if (savedKeys) {
+      try {
+        setApiKeys(JSON.parse(savedKeys));
+      } catch (e) {
+        console.error('Failed to load API keys:', e);
+      }
+    }
+  }, []);
+
+  // Save API keys to localStorage when they change
+  const updateApiKey = (key, value) => {
+    const newKeys = { ...apiKeys, [key]: value };
+    setApiKeys(newKeys);
+    localStorage.setItem('quorum_api_keys', JSON.stringify(newKeys));
+  };
 
   const handleSendMessage = async () => {
     if (!input.trim() || selectedModels.length === 0) return;
@@ -63,7 +92,8 @@ export default function Home() {
           messages: messagesForAPI,
           models: selectedModels,
           temperature,
-          systemPrompt
+          systemPrompt,
+          apiKeys
         })
       });
 
@@ -101,7 +131,8 @@ export default function Home() {
         body: JSON.stringify({
           action: 'synthesize',
           responses: message.responses,
-          synthesisModel
+          synthesisModel,
+          apiKeys
         })
       });
 
@@ -235,6 +266,15 @@ export default function Home() {
                   <ArrowDownTrayIcon className="w-5 h-5" />
                 </button>
                 <button
+                  onClick={() => setShowApiKeys(!showApiKeys)}
+                  className={`p-1.5 rounded-md transition-colors ${
+                    showApiKeys ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                  }`}
+                  title="API Keys"
+                >
+                  <KeyIcon className="w-5 h-5" />
+                </button>
+                <button
                   onClick={() => setShowSystemPrompt(!showSystemPrompt)}
                   className={`p-1.5 rounded-md transition-colors ${
                     showSystemPrompt ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
@@ -255,6 +295,66 @@ export default function Home() {
             </div>
           </div>
         </header>
+
+        {/* API Keys Section */}
+        {showApiKeys && (
+          <div className="bg-gray-50 border-b border-gray-200">
+            <div className="max-w-7xl mx-auto px-4 py-4">
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium text-gray-700">API Keys (stored locally in browser):</label>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                  <div>
+                    <label className="text-xs text-gray-600">Anthropic (Claude)</label>
+                    <input
+                      type="password"
+                      value={apiKeys.ANTHROPIC_API_KEY}
+                      onChange={(e) => updateApiKey('ANTHROPIC_API_KEY', e.target.value)}
+                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-600">OpenAI (GPT)</label>
+                    <input
+                      type="password"
+                      value={apiKeys.OPENAI_API_KEY}
+                      onChange={(e) => updateApiKey('OPENAI_API_KEY', e.target.value)}
+                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-600">Google (Gemini)</label>
+                    <input
+                      type="password"
+                      value={apiKeys.GOOGLE_API_KEY}
+                      onChange={(e) => updateApiKey('GOOGLE_API_KEY', e.target.value)}
+                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-600">xAI (Grok)</label>
+                    <input
+                      type="password"
+                      value={apiKeys.XAI_API_KEY}
+                      onChange={(e) => updateApiKey('XAI_API_KEY', e.target.value)}
+                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-600">DeepInfra</label>
+                    <input
+                      type="password"
+                      value={apiKeys.DEEPINFRA_API_KEY}
+                      onChange={(e) => updateApiKey('DEEPINFRA_API_KEY', e.target.value)}
+                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* System Prompt Section */}
         {showSystemPrompt && (

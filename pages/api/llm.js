@@ -6,23 +6,23 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { action, ...params } = req.body;
+  const { action, apiKeys, ...params } = req.body;
 
   try {
     switch (action) {
       case 'chat':
         // Single LLM call
-        const response = await callLLM(params);
+        const response = await callLLM({ ...params, apiKeys });
         return res.status(200).json({ response });
 
       case 'multi-chat':
         // Multiple LLMs in parallel
-        const responses = await callMultipleLLMs(params);
+        const responses = await callMultipleLLMs({ ...params, apiKeys });
         return res.status(200).json({ responses });
 
       case 'synthesize':
         // Synthesize multiple responses
-        const synthesis = await synthesizeResponses(params);
+        const synthesis = await synthesizeResponses({ ...params, apiKeys });
         return res.status(200).json({ synthesis });
 
       default:
