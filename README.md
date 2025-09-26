@@ -139,7 +139,6 @@ Edit `lib/llm.js` and add to `modelConfigs`:
 'model-id': {
   provider: 'provider-name',
   modelName: 'api-model-name',
-  maxTokens: 4000,
   displayName: 'Display Name',
   color: '#HexColor',
   cost: { input: 0.00, output: 0.00 }, // per million tokens

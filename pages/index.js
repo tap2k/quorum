@@ -516,26 +516,45 @@ export default function Home() {
                         <span className="text-sm font-medium text-gray-700">
                           Synthesis ({modelConfigs[message.model]?.displayName})
                         </span>
-                        {modelConfigs[message.model]?.cost && (() => {
-                          // For synthesis, input includes the multiple model responses
-                          const messageIndex = messages.indexOf(message);
-                          const priorMessage = messages[messageIndex - 1];
-                          let synthesisInput = '';
+                        <div className="flex items-center gap-2">
+                          {modelConfigs[message.model]?.cost && (() => {
+                            // For synthesis, input includes the multiple model responses
+                            const messageIndex = messages.indexOf(message);
+                            const priorMessage = messages[messageIndex - 1];
+                            let synthesisInput = '';
 
-                          if (priorMessage?.responses) {
-                            priorMessage.responses.forEach(r => {
-                              if (r.success) {
-                                synthesisInput += modelConfigs[r.model]?.displayName + ':\n' + r.response + '\n\n';
+                            if (priorMessage?.responses) {
+                              priorMessage.responses.forEach(r => {
+                                if (r.success) {
+                                  synthesisInput += modelConfigs[r.model]?.displayName + ':\n' + r.response + '\n\n';
+                                }
+                              });
+                            }
+
+                            return (
+                              <span className="text-xs text-gray-500">
+                                ~{calculateCost(message.model, synthesisInput, message.content)?.formatted || ''}
+                              </span>
+                            );
+                          })()}
+                          <button
+                            onClick={() => {
+                              // Find the assistant message before this synthesis
+                              const messageIndex = messages.indexOf(message);
+                              const priorMessageIndex = messageIndex - 1;
+                              if (priorMessageIndex >= 0 && messages[priorMessageIndex].responses) {
+                                // Remove the old synthesis and re-synthesize
+                                setMessages(messages.filter((_, i) => i !== messageIndex));
+                                setTimeout(() => handleSynthesize(priorMessageIndex), 100);
                               }
-                            });
-                          }
-
-                          return (
-                            <span className="text-xs text-gray-500">
-                              ~{calculateCost(message.model, synthesisInput, message.content)?.formatted || ''}
-                            </span>
-                          );
-                        })()}
+                            }}
+                            disabled={isLoading}
+                            className="text-xs px-2 py-1 text-blue-600 hover:bg-blue-50 rounded disabled:opacity-50"
+                            title="Re-synthesize responses"
+                          >
+                            Regenerate
+                          </button>
+                        </div>
                       </div>
                       <p className="text-gray-700 whitespace-pre-wrap">{message.content}</p>
                     </div>
@@ -558,13 +577,19 @@ export default function Home() {
         <div className="sticky bottom-0 bg-white border-t border-gray-200">
           <div className="max-w-7xl mx-auto px-4 py-4">
             <div className="flex gap-3">
-              <input
-                type="text"
+              <textarea
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSendMessage();
+                  }
+                }}
                 placeholder={selectedModels.length === 0 ? "Select models first..." : "Ask a question..."}
                 disabled={isLoading || selectedModels.length === 0}
+                rows={1}
+                style={{ overflow: 'hidden', resize: 'none' }}
                 className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
               />
               <button
