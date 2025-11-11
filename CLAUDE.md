@@ -9,7 +9,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Compare responses from different AI providers side-by-side
 - Customize system prompts for each conversation
 - Synthesize insights from multiple AI responses
-- Support for models from Anthropic, OpenAI, Google, xAI (Grok), and Meta
+- Support for 25+ models from 8 providers: Anthropic, OpenAI, Google, xAI, Meta, DeepSeek, Qwen, Moonshot, Zhipu AI
 
 ## Development Commands
 
@@ -61,30 +61,25 @@ Environment variables are configured in `.env` file (see `.env.example` for temp
 
 ### Supported Models
 
-**Anthropic**
-- Claude Sonnet 4 (claude-sonnet-4-0)
-- Claude Opus 4 (claude-opus-4-1)
+**Anthropic** - Claude Sonnet 4.5, Haiku 4.5, Sonnet 4, Opus 4.1
 
-**OpenAI**
-- GPT-5 (gpt-5) - Note: No custom temperature support
-- GPT-5 Mini (gpt-5-mini) - Note: No custom temperature support
-- GPT-5 Nano (gpt-5-nano) - Note: No custom temperature support
+**OpenAI** - GPT-5, GPT-5 Mini, GPT-5 Nano (no custom temperature)
 
-**Google**
-- Gemini 2.5 Pro (gemini-2.5-pro)
-- Gemini 2.5 Flash (gemini-2.5-flash)
-- Gemini 2.5 Flash Lite (gemini-2.5-flash-lite)
+**Google** - Gemini 2.5 Pro, Flash, Flash Lite
 
-**xAI**
-- Grok 4 (grok-4)
+**xAI** - Grok 4, Grok 4 Fast (Reasoning & Non-Reasoning)
 
-**Meta (via DeepInfra)**
-- Llama 4 Maverick (meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8)
-- Llama 4 Scout (meta-llama/Llama-4-Scout-17B-16E-Instruct)
+**Meta (via DeepInfra)** - Llama 4 Maverick, Llama 4 Scout
 
-**DeepSeek (via DeepInfra)**
-- DeepSeek V3 (deepseek-ai/DeepSeek-V3)
-- DeepSeek R1 (deepseek-ai/DeepSeek-R1-Turbo)
+**DeepSeek (via DeepInfra)** - V3.2 Exp, V3.1 Terminus, R1
+
+**Qwen (via DeepInfra)** - Qwen3 235B A22B Thinking, Qwen3 Next 80B Thinking & Instruct
+
+**Moonshot (via DeepInfra)** - Kimi K2 Instruct
+
+**Zhipu AI (via DeepInfra)** - GLM-4.6
+
+**Open Source (via DeepInfra)** - GPT-OSS 120B, GPT-OSS 20B
 
 ## Feature Status
 
