@@ -1,0 +1,52 @@
+name: Deploy to Digital Ocean
+
+on:
+  push:
+    branches:
+      - main  # Deploy when pushing to main branch
+  workflow_dispatch:  # Allow manual deployment
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Digital Ocean
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DO_HOST }}
+          username: ${{ secrets.DO_USERNAME }}
+          key: ${{ secrets.DO_SSH_KEY }}
+          port: ${{ secrets.DO_PORT || 22 }}
+          script: |
+            # Load environment variables and NVM
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+            # Set PM2_HOME to ensure we're using the right PM2 instance
+            export PM2_HOME="/opt/pm2"
+
+            # Navigate to project directory
+            cd ~/pm2/quorum
+
+            # Pull latest code
+            git fetch origin
+            git reset --hard origin/main
+
+            # Install dependencies
+            npm ci --production=false
+
+            # Build the application
+            NODE_ENV=production npm run build
+
+            # Restart PM2 process - try by ID or name
+            pm2 reload Quorum || pm2 reload 5
+
+            # Save PM2 process list
+            pm2 save
+
+            # Show status
+            pm2 status
