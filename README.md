@@ -17,8 +17,10 @@ Quorum enables simultaneous conversations with multiple Large Language Models, a
 ## Supported Models
 
 ### Anthropic
+- Claude Sonnet 4.5
+- Claude Haiku 4.5
 - Claude Sonnet 4
-- Claude Opus 4
+- Claude Opus 4.1
 
 ### OpenAI
 - GPT-5
@@ -32,14 +34,32 @@ Quorum enables simultaneous conversations with multiple Large Language Models, a
 
 ### xAI
 - Grok 4
+- Grok 4 Fast (Reasoning)
+- Grok 4 Fast (Non-Reasoning)
 
 ### Meta (via DeepInfra)
 - Llama 4 Maverick
 - Llama 4 Scout
 
 ### DeepSeek (via DeepInfra)
-- DeepSeek V3
+- DeepSeek V3.2 Exp
+- DeepSeek V3.1 Terminus
 - DeepSeek R1
+
+### Qwen (via DeepInfra)
+- Qwen3 235B A22B Thinking
+- Qwen3 Next 80B Thinking
+- Qwen3 Next 80B Instruct
+
+### Moonshot (via DeepInfra)
+- Kimi K2 Instruct
+
+### Zhipu AI (via DeepInfra)
+- GLM-4.6
+
+### Open Source (via DeepInfra)
+- GPT-OSS 120B
+- GPT-OSS 20B
 
 ## Prerequisites
 
@@ -164,6 +184,21 @@ npm run start
 # Run linter
 npm run lint
 ```
+
+## Deployment
+
+Quorum includes automated deployment via GitHub Actions:
+
+- **Automatic**: Deploys on every push to `main` branch
+- **Manual**: Can be triggered via GitHub Actions workflow dispatch
+- **Target**: Digital Ocean droplet via SSH
+- **Process**: Pulls latest code, installs dependencies, builds, and reloads PM2 process
+
+Configure these secrets in your GitHub repository:
+- `DO_HOST` - Digital Ocean server hostname/IP
+- `DO_USERNAME` - SSH username
+- `DO_SSH_KEY` - Private SSH key for authentication
+- `DO_PORT` - SSH port (optional, defaults to 22)
 
 ## Troubleshooting
 
