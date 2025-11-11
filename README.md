@@ -185,21 +185,6 @@ npm run start
 npm run lint
 ```
 
-## Deployment
-
-Quorum includes automated deployment via GitHub Actions:
-
-- **Automatic**: Deploys on every push to `main` branch
-- **Manual**: Can be triggered via GitHub Actions workflow dispatch
-- **Target**: Digital Ocean droplet via SSH
-- **Process**: Pulls latest code, installs dependencies, builds, and reloads PM2 process
-
-Configure these secrets in your GitHub repository:
-- `DO_HOST` - Digital Ocean server hostname/IP
-- `DO_USERNAME` - SSH username
-- `DO_SSH_KEY` - Private SSH key for authentication
-- `DO_PORT` - SSH port (optional, defaults to 22)
-
 ## Troubleshooting
 
 ### Model Errors
