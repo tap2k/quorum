@@ -43,7 +43,7 @@ jobs:
             NODE_ENV=production npm run build
 
             # Restart PM2 process - try by ID or name
-            pm2 reload Quorum || pm2 reload 5
+            pm2 reload Quorum
 
             # Save PM2 process list
             pm2 save
