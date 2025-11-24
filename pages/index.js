@@ -269,18 +269,16 @@ export default function Home() {
                 </button>
                 <button
                   onClick={() => setShowApiKeys(!showApiKeys)}
-                  className={`p-1.5 rounded-md transition-colors ${
-                    showApiKeys ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                  }`}
+                  className={`p-1.5 rounded-md transition-colors ${showApiKeys ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                    }`}
                   title="API Keys"
                 >
                   <KeyIcon className="w-5 h-5" />
                 </button>
                 <button
                   onClick={() => setShowSystemPrompt(!showSystemPrompt)}
-                  className={`p-1.5 rounded-md transition-colors ${
-                    showSystemPrompt ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                  }`}
+                  className={`p-1.5 rounded-md transition-colors ${showSystemPrompt ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                    }`}
                   title="Settings"
                 >
                   <Cog6ToothIcon className="w-5 h-5" />
@@ -412,11 +410,10 @@ export default function Home() {
                   <button
                     key={model.id}
                     onClick={() => toggleModel(model.id)}
-                    className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
-                      selectedModels.includes(model.id)
-                        ? 'text-white'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                    }`}
+                    className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${selectedModels.includes(model.id)
+                      ? 'text-white'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      }`}
                     style={{
                       backgroundColor: selectedModels.includes(model.id) ? model.color : undefined
                     }}
@@ -471,8 +468,13 @@ export default function Home() {
                               </h3>
                               <div className="flex items-center gap-2">
                                 {response.success && config?.cost && (
-                                  <span className="text-xs text-gray-500">
-                                    ~{calculateCost(response.model, inputText, response.response)?.formatted || ''}
+                                  <span className="text-xs text-gray-500 flex items-center gap-2">
+                                    <span>~{calculateCost(response.model, inputText, response.response)?.formatted || ''}</span>
+                                    {response.duration && (
+                                      <span className="text-gray-400 border-l border-gray-300 pl-2">
+                                        {(response.duration / 1000).toFixed(1)}s
+                                      </span>
+                                    )}
                                   </span>
                                 )}
                                 {!response.success && (
@@ -499,7 +501,7 @@ export default function Home() {
                         <button
                           onClick={() => handleSynthesize(index)}
                           disabled={isLoading}
-                          className="px-3 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="px-3 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed"
                           title="Synthesize responses"
                         >
                           Synthesize Responses
