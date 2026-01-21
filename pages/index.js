@@ -445,6 +445,7 @@ export default function Home() {
                     style={{
                       backgroundColor: selectedModels.includes(model.id) ? model.color : undefined
                     }}
+                    title={model.cost ? `Input: $${model.cost.input.toFixed(2)}/M tokens | Output: $${model.cost.output.toFixed(2)}/M tokens` : 'Cost info not available'}
                   >
                     {model.displayName}
                   </button>
