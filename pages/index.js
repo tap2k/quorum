@@ -21,6 +21,7 @@ export default function Home() {
   const [showApiKeys, setShowApiKeys] = useState(false);
   const [temperature, setTemperature] = useState(0.7);
   const [synthesisModel, setSynthesisModel] = useState('gemini-2.5-flash');
+  const [showLegacyModels, setShowLegacyModels] = useState(false);
   const [apiKeys, setApiKeys] = useState({
     ANTHROPIC_API_KEY: '',
     OPENAI_API_KEY: '',
@@ -30,8 +31,8 @@ export default function Home() {
   });
   const messagesEndRef = useRef(null);
 
-  // Always show all models - backend will handle authorization
-  const availableModels = getAvailableModels();
+  // Get models based on legacy setting
+  const availableModels = getAvailableModels({ includeLegacy: showLegacyModels });
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -394,6 +395,15 @@ export default function Home() {
                         <option key={id} value={id}>{config.displayName}</option>
                       ))}
                     </select>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="text-sm text-gray-600">Show Legacy Models:</label>
+                    <input
+                      type="checkbox"
+                      checked={showLegacyModels}
+                      onChange={(e) => setShowLegacyModels(e.target.checked)}
+                      className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                    />
                   </div>
                 </div>
               </div>
