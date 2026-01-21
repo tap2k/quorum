@@ -22,6 +22,7 @@ export default function Home() {
   const [temperature, setTemperature] = useState(0.7);
   const [synthesisModel, setSynthesisModel] = useState('gemini-2.5-flash');
   const [showLegacyModels, setShowLegacyModels] = useState(false);
+  const [reasoning, setReasoning] = useState('off'); // 'off', 'low', 'medium', 'high'
   const [apiKeys, setApiKeys] = useState({
     ANTHROPIC_API_KEY: '',
     OPENAI_API_KEY: '',
@@ -94,7 +95,8 @@ export default function Home() {
           models: selectedModels,
           temperature,
           systemPrompt,
-          apiKeys
+          apiKeys,
+          reasoning: reasoning !== 'off' ? reasoning : null
         })
       });
 
@@ -189,6 +191,7 @@ export default function Home() {
       messages,
       systemPrompt,
       temperature,
+      reasoning,
       selectedModels,
       synthesisModel,
       exportedAt: new Date().toISOString()
@@ -217,6 +220,7 @@ export default function Home() {
         if (data.messages) setMessages(data.messages);
         if (data.systemPrompt) setSystemPrompt(data.systemPrompt);
         if (data.temperature !== undefined) setTemperature(data.temperature);
+        if (data.reasoning) setReasoning(data.reasoning);
         if (data.selectedModels) setSelectedModels(data.selectedModels);
         if (data.synthesisModel) setSynthesisModel(data.synthesisModel);
         alert('Conversation imported successfully!');
@@ -370,7 +374,7 @@ export default function Home() {
                   rows="3"
                   placeholder="Enter system prompt..."
                 />
-                <div className="flex items-center gap-4">
+                <div className="flex flex-wrap items-center gap-4">
                   <div className="flex items-center gap-2">
                     <label className="text-sm text-gray-600">Temperature:</label>
                     <input
@@ -383,6 +387,20 @@ export default function Home() {
                       className="w-32"
                     />
                     <span className="text-sm text-gray-700 w-8">{temperature}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="text-sm text-gray-600">Thinking:</label>
+                    <select
+                      value={reasoning}
+                      onChange={(e) => setReasoning(e.target.value)}
+                      className="px-2 py-1 border border-gray-300 rounded text-sm"
+                      title="Enable extended thinking for supported models (Claude 4+, Gemini 2.5+, GPT-5, o-series)"
+                    >
+                      <option value="off">Off</option>
+                      <option value="low">Low</option>
+                      <option value="medium">Medium</option>
+                      <option value="high">High</option>
+                    </select>
                   </div>
                   <div className="flex items-center gap-2">
                     <label className="text-sm text-gray-600">Synthesis Model:</label>
