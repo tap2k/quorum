@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import Head from 'next/head';
-import { modelConfigs, getAvailableModels, calculateCost, calculateConversationCost, buildInputText } from '@/lib/llm';
+import { modelConfigs, getAvailableModels, calculateCost, calculateCostFromUsage, calculateConversationCost, buildInputText } from '@/lib/llm';
 import {
   CloudArrowUpIcon,
   ArrowDownTrayIcon,
@@ -498,7 +498,21 @@ export default function Home() {
                               <div className="flex items-center gap-2">
                                 {response.success && config?.cost && (
                                   <span className="text-xs text-gray-500 flex items-center gap-2">
-                                    <span>~{calculateCost(response.model, inputText, response.response)?.formatted || ''}</span>
+                                    {(() => {
+                                      const cost = response.usage
+                                        ? calculateCostFromUsage(response.model, response.usage)
+                                        : calculateCost(response.model, inputText, response.response);
+                                      return (
+                                        <>
+                                          <span>{response.usage ? '' : '~'}{cost?.formatted || ''}</span>
+                                          {response.usage?.thinkingTokens > 0 && (
+                                            <span className="text-purple-500">
+                                              +{(response.usage.thinkingTokens / 1000).toFixed(1)}k thinking
+                                            </span>
+                                          )}
+                                        </>
+                                      );
+                                    })()}
                                     {response.duration && (
                                       <span className="text-gray-400 border-l border-gray-300 pl-2">
                                         {(response.duration / 1000).toFixed(1)}s
