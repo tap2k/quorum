@@ -58,7 +58,7 @@ export default function Dialogue() {
   const [dialogueTurns, setDialogueTurns] = useState([]);
   const [isRunning, setIsRunning] = useState(false);
   const [currentThinker, setCurrentThinker] = useState(null);
-  const [synthesisModel, setSynthesisModel] = useState('gemini-2.5-flash');
+  const [synthesisModel, setSynthesisModel] = useState('gemini-3-flash');
   const [synthesisContent, setSynthesisContent] = useState(null);
   const [isSynthesizing, setIsSynthesizing] = useState(false);
   const [showApiKeys, setShowApiKeys] = useState(false);
@@ -206,18 +206,38 @@ export default function Dialogue() {
 
     setIsSynthesizing(true);
     try {
+      const nameA = configA?.displayName || modelA;
+      const nameB = configB?.displayName || modelB;
+
+      // Format as turn-by-turn dialogue so synthesis model can follow the flow
+      const dialogueText = dialogueTurns
+        .filter(t => t.success)
+        .map(t => `**${t.side === 'A' ? nameA : nameB}:** ${t.content}`)
+        .join('\n\n---\n\n');
+
       const responses = [
-        {
-          model: modelA,
-          response: dialogueTurns.filter(t => t.side === 'A' && t.success).map(t => t.content).join('\n\n'),
-          success: true,
-        },
-        {
-          model: modelB,
-          response: dialogueTurns.filter(t => t.side === 'B' && t.success).map(t => t.content).join('\n\n'),
-          success: true,
-        },
+        { model: modelA, response: dialogueText, success: true },
       ];
+
+      const synthesisPrompt = `You are analyzing a dialogue between two AI models. Each model had its own perspective and system prompt.
+
+Analyze the dialogue and provide:
+
+1. **Summary** — What was the dialogue about? What was the central question or topic?
+
+2. **${nameA}'s Position** — What were their main arguments, claims, or contributions? What was their overall stance?
+
+3. **${nameB}'s Position** — Same as above.
+
+4. **Points of Agreement** — Where did the models converge or reinforce each other?
+
+5. **Points of Disagreement** — Where did they diverge, contradict, or challenge each other?
+
+6. **Assessment** — Which model made stronger or more well-supported arguments, and why? Were there any logical gaps, unsupported claims, or particularly compelling points from either side? Was there a clear "winner," or did each model contribute different strengths?
+
+7. **Key Takeaway** — What is the most useful or important insight a reader should walk away with from this exchange?
+
+Be specific — reference actual claims made in the dialogue rather than speaking in generalities.`;
 
       const response = await fetch('/api/llm', {
         method: 'POST',
@@ -226,6 +246,7 @@ export default function Dialogue() {
           action: 'synthesize',
           responses,
           synthesisModel,
+          synthesisPrompt,
           apiKeys,
         })
       });
