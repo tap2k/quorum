@@ -135,9 +135,22 @@ Environment variables are configured in `.env` file (see `.env.example` for temp
 - `systemPrompt` - System instructions
 - `synthesisModel` - Model for synthesis
 
+## Canonical Model Registry
+
+**`lib/llm.js` is the canonical model registry across all projects.** When adding or updating models, update quorum first, then propagate to the other repos. Each repo has a different format and scope:
+
+### Exhaustive (should have all non-legacy quorum models)
+- **whatsupp2** (`~/dev/whatsupp/whatsupp2/hooks/utils.js`) - UX research SaaS platform (AI interviews, simulation, analysis). `modelMap` array with aliases, inputCost/outputCost/maxInputChars
+- **twinning** (`~/dev/whatsupp/twinning/twinexperiments/llm_client.py`) - LLM benchmarking framework for AI persona simulation accuracy. Python `MODEL_MAP` list with inputCost/outputCost/maxChars
+- **redscrape** (`~/dev/whatsupp/redscrape/llm_functions.py`) - AI persona simulation platform grounded in Reddit data. Python `MODEL_MAP` list with shortName/provider/modelName/maxChars
+### Curated (only need latest model per provider/tier)
+- **filer** (`~/dev/filer/llm_functions.py`) - Academic paper analyzer (metadata extraction, clustering, theme identification). Python `MODEL_MAP` list with shortName/provider/modelName/maxChars
+- **redanalyze** (`~/dev/whatsupp/redanalyze/llm_functions.py`) - Reddit/app store scraping and LLM-powered analysis toolkit. Python `MODEL_MAP`, slim ~18 models
+- **uxeai** (`~/dev/whatsupp/uxeai/uxe2/lib/llm.ts`) - AI copilot for querying UX research data via natural language. TypeScript `modelConfigs` object, quorum-like format with cost/color/displayName
+
 ## Development Guidelines
 
-1. **Adding New Models**: Update `modelConfigs` in `lib/llm.js`
+1. **Adding New Models**: Update `modelConfigs` in `lib/llm.js`, then propagate to other repos per the canonical registry section above
 2. **Provider Integration**: Add provider-specific function in `lib/llm.js`
 3. **UI Updates**: Modify `pages/index.js` for interface changes
 4. **Error Handling**: Always include try-catch blocks for API calls
