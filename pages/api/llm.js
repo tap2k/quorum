@@ -12,8 +12,8 @@ export default async function handler(req, res) {
     switch (action) {
       case 'chat':
         // Single LLM call
-        const { content, duration } = await callLLM({ ...params, apiKeys });
-        return res.status(200).json({ response: content, duration });
+        const { content, duration, usage } = await callLLM({ ...params, apiKeys });
+        return res.status(200).json({ response: content, duration, usage });
 
       case 'multi-chat':
         // Multiple LLMs in parallel
