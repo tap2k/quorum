@@ -15,14 +15,16 @@ function buildHistoryForModel(turns, side, introMessage) {
   const messages = [];
   if (side === 'A') {
     messages.push({ role: 'user', content: introMessage });
-    for (const turn of turns) {
+  }
+  for (const turn of turns) {
+    if (turn.type === 'interjection') {
+      messages.push({ role: 'user', content: turn.content });
+    } else if (side === 'A') {
       messages.push({
         role: turn.side === 'A' ? 'assistant' : 'user',
         content: turn.content,
       });
-    }
-  } else {
-    for (const turn of turns) {
+    } else {
       messages.push({
         role: turn.side === 'A' ? 'user' : 'assistant',
         content: turn.content,
@@ -35,6 +37,7 @@ function buildHistoryForModel(turns, side, introMessage) {
 function calculateDialogueCost(turns) {
   let total = 0;
   for (const turn of turns) {
+    if (turn.type === 'interjection') continue;
     if (turn.usage) {
       const cost = calculateCostFromUsage(turn.model, turn.usage);
       total += cost?.total || 0;
@@ -58,6 +61,7 @@ export default function Dialogue() {
   const [dialogueTurns, setDialogueTurns] = useState([]);
   const [isRunning, setIsRunning] = useState(false);
   const [currentThinker, setCurrentThinker] = useState(null);
+  const [interjection, setInterjection] = useState('');
   const [synthesisModel, setSynthesisModel] = useState('gemini-3-flash');
   const [synthesisContent, setSynthesisContent] = useState(null);
   const [isSynthesizing, setIsSynthesizing] = useState(false);
@@ -98,14 +102,19 @@ export default function Dialogue() {
     localStorage.setItem('quorum_api_keys', JSON.stringify(newKeys));
   };
 
-  const runDialogue = async () => {
+  const runDialogue = async (existingTurns = null) => {
     setIsRunning(true);
     shouldStopRef.current = false;
-    setDialogueTurns([]);
-    setSynthesisContent(null);
     setCurrentThinker(null);
 
-    const turns = [];
+    let turns;
+    if (existingTurns) {
+      turns = [...existingTurns];
+    } else {
+      turns = [];
+      setDialogueTurns([]);
+      setSynthesisContent(null);
+    }
 
     for (let round = 0; round < numRounds; round++) {
       if (shouldStopRef.current) break;
@@ -201,6 +210,17 @@ export default function Dialogue() {
     shouldStopRef.current = true;
   };
 
+  const continueDialogue = () => {
+    let turns = [...dialogueTurns];
+    if (interjection.trim()) {
+      turns.push({ type: 'interjection', content: interjection.trim() });
+      setDialogueTurns(turns);
+      setInterjection('');
+    }
+    setSynthesisContent(null);
+    runDialogue(turns);
+  };
+
   const handleSynthesize = async () => {
     if (dialogueTurns.filter(t => t.success).length < 2) return;
 
@@ -211,8 +231,11 @@ export default function Dialogue() {
 
       // Format as turn-by-turn dialogue so synthesis model can follow the flow
       const dialogueText = dialogueTurns
-        .filter(t => t.success)
-        .map(t => `**${t.side === 'A' ? nameA : nameB}:** ${t.content}`)
+        .filter(t => t.success || t.type === 'interjection')
+        .map(t => {
+          if (t.type === 'interjection') return `**[User Interjection]:** ${t.content}`;
+          return `**${t.side === 'A' ? nameA : nameB}:** ${t.content}`;
+        })
         .join('\n\n---\n\n');
 
       const responses = [
@@ -528,7 +551,7 @@ Be specific — reference actual claims made in the dialogue rather than speakin
                   </button>
                 ) : (
                   <button
-                    onClick={runDialogue}
+                    onClick={() => runDialogue()}
                     disabled={!canStart}
                     className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
@@ -556,6 +579,17 @@ Be specific — reference actual claims made in the dialogue rather than speakin
 
             {/* Turns */}
             {dialogueTurns.map((turn, index) => {
+              if (turn.type === 'interjection') {
+                return (
+                  <div key={index} className="flex justify-center">
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 max-w-2xl">
+                      <p className="text-xs font-medium text-blue-600 mb-1">Interjection</p>
+                      <p className="text-sm text-gray-700 whitespace-pre-wrap">{turn.content}</p>
+                    </div>
+                  </div>
+                );
+              }
+
               const config = modelConfigs[turn.model];
               const isLeft = turn.side === 'A';
 
@@ -643,6 +677,34 @@ Be specific — reference actual claims made in the dialogue rather than speakin
                     <p className="text-gray-700 whitespace-pre-wrap">{synthesisContent}</p>
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* Continue / Interject */}
+            {!isRunning && dialogueTurns.length > 0 && dialogueTurns[dialogueTurns.length - 1].success !== false && (
+              <div className="pt-6 border-t border-gray-200 mt-6">
+                <div className="flex gap-3">
+                  <textarea
+                    value={interjection}
+                    onChange={(e) => setInterjection(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        continueDialogue();
+                      }
+                    }}
+                    placeholder="Interject something, or just continue..."
+                    rows={1}
+                    style={{ overflow: 'hidden', resize: 'none' }}
+                    className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  />
+                  <button
+                    onClick={continueDialogue}
+                    className="px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm"
+                  >
+                    {interjection.trim() ? 'Interject & Continue' : `Continue (${numRounds} rounds)`}
+                  </button>
+                </div>
               </div>
             )}
 
