@@ -63,7 +63,7 @@ Environment variables are configured in `.env` file (see `.env.example` for temp
 
 **Anthropic** - Claude Sonnet 4.5, Haiku 4.5, Sonnet 4, Opus 4.1
 
-**OpenAI** - GPT-5, GPT-5 Mini, GPT-5 Nano (no custom temperature)
+**OpenAI** - GPT-5.4, GPT-5.4 Mini, GPT-5.4 Nano (no custom temperature)
 
 **Google** - Gemini 2.5 Pro, Flash, Flash Lite
 
