@@ -156,6 +156,10 @@ Environment variables are configured in `.env` file (see `.env.example` for temp
 4. **Error Handling**: Always include try-catch blocks for API calls
 5. **Testing**: Test with missing API keys and network failures
 
+## Memory Preferences
+
+- **Do not use the auto-memory system** for this project. Do not write any files to `~/.claude/projects/-Users-parikh-dev-quorum/memory/`. If memory files exist there, delete them rather than extending them. Persist anything important here in CLAUDE.md instead.
+
 ## Important Notes
 
 - API keys are sensitive - never commit them to version control

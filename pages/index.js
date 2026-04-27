@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import Head from 'next/head';
-import { modelConfigs, getAvailableModels, calculateCost, calculateCostFromUsage, calculateConversationCost, buildInputText } from '@/lib/llm';
+import { modelConfigs, getAvailableModels, calculateCost, calculateCostFromUsage, calculateConversationCost, buildInputText, getContextUsage } from '@/lib/llm';
 import {
   CloudArrowUpIcon,
   ArrowDownTrayIcon,
@@ -621,6 +621,29 @@ export default function Home() {
         {/* Input Area */}
         <div className="sticky bottom-0 bg-white border-t border-gray-200">
           <div className="max-w-7xl mx-auto px-4 py-4">
+            {(() => {
+              if (selectedModels.length === 0) return null;
+              const projected = buildInputText(messages, systemPrompt) + '\n' + input;
+              const usages = selectedModels
+                .map(m => ({ model: m, usage: getContextUsage(m, projected) }))
+                .filter(u => u.usage);
+              const over = usages.filter(u => u.usage.overLimit);
+              const near = usages.filter(u => u.usage.nearLimit && !u.usage.overLimit);
+              if (over.length === 0 && near.length === 0) return null;
+              const worst = (over.length ? over : near)
+                .sort((a, b) => b.usage.ratio - a.usage.ratio)[0];
+              const pct = Math.round(worst.usage.ratio * 100);
+              const color = over.length ? 'text-red-600' : 'text-orange-600';
+              const verb = over.length ? 'exceeds' : 'nears';
+              const affected = (over.length ? over : near)
+                .map(u => modelConfigs[u.model]?.displayName || u.model)
+                .join(', ');
+              return (
+                <p className={`text-xs ${color} mb-2`}>
+                  Input {verb} context limit for {affected} ({pct}% of {modelConfigs[worst.model]?.displayName} max)
+                </p>
+              );
+            })()}
             <div className="flex gap-3">
               <textarea
                 value={input}
