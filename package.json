@@ -2,6 +2,17 @@
   "name": "quorum",
   "version": "0.1.0",
   "private": true,
+  "description": "Multi-LLM conversation platform — query many models in parallel, compare, and synthesize.",
+  "author": "Tap Parikh <tparikh@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/tap2k/quorum#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tap2k/quorum.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tap2k/quorum/issues"
+  },
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",

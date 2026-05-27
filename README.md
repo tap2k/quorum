@@ -5,6 +5,8 @@
 
 Quorum enables simultaneous conversations with multiple Large Language Models, allowing you to compare responses, synthesize insights, and leverage the strengths of different AI providers in a single interface.
 
+> **Note:** Quorum is designed to be **self-hosted** — you bring your own API keys and run it locally or on a server only you can reach. The `/api/llm` endpoint has no auth or rate-limiting, so don't expose a Quorum instance to the public internet without adding those yourself.
+
 ## Features
 
 - 🤖 **Multi-Model Conversations** - Query multiple LLMs simultaneously
@@ -16,50 +18,20 @@ Quorum enables simultaneous conversations with multiple Large Language Models, a
 
 ## Supported Models
 
-### Anthropic
-- Claude Sonnet 4.5
-- Claude Haiku 4.5
-- Claude Sonnet 4
-- Claude Opus 4.1
+Quorum currently ships configs for **80+ models across 10+ providers**. A few highlights:
 
-### OpenAI
-- GPT-5
-- GPT-5 Mini
-- GPT-5 Nano
+- **Anthropic** — Claude Opus 4.7, Sonnet 4.6, Haiku 4.5
+- **OpenAI** — GPT-5.5, GPT-5.4 (+ Mini/Nano), o3, o4-mini
+- **Google** — Gemini 3.1 Pro, 3.5 Flash, 2.5 Pro/Flash
+- **xAI** — Grok 4.3, Grok 4.20 Beta, Grok 4
+- **Meta** — Llama 4 Maverick, Llama 4 Scout *(via DeepInfra)*
+- **DeepSeek** — V4 Pro/Flash, V3.2 Exp, R1 *(via DeepInfra)*
+- **Qwen** — Qwen3.5 / Qwen3.6 family *(via DeepInfra)*
+- **Moonshot** — Kimi K2.6, K2.5 *(via DeepInfra)*
+- **Zhipu AI** — GLM-5.1, GLM-4.7 *(via DeepInfra)*
+- **Open source** — Gemma, Mistral, GPT-OSS *(via DeepInfra)*
 
-### Google
-- Gemini 2.5 Pro
-- Gemini 2.5 Flash
-- Gemini 2.5 Flash Lite
-
-### xAI
-- Grok 4
-- Grok 4 Fast (Reasoning)
-- Grok 4 Fast (Non-Reasoning)
-
-### Meta (via DeepInfra)
-- Llama 4 Maverick
-- Llama 4 Scout
-
-### DeepSeek (via DeepInfra)
-- DeepSeek V3.2 Exp
-- DeepSeek V3.1 Terminus
-- DeepSeek R1
-
-### Qwen (via DeepInfra)
-- Qwen3 235B A22B Thinking
-- Qwen3 Next 80B Thinking
-- Qwen3 Next 80B Instruct
-
-### Moonshot (via DeepInfra)
-- Kimi K2 Instruct
-
-### Zhipu AI (via DeepInfra)
-- GLM-4.6
-
-### Open Source (via DeepInfra)
-- GPT-OSS 120B
-- GPT-OSS 20B
+The full registry — including pricing, context windows, and provider routing — lives in [`lib/llm.js`](lib/llm.js). To add or update a model, edit `modelConfigs` there.
 
 ## Prerequisites
 
@@ -71,7 +43,7 @@ Quorum enables simultaneous conversations with multiple Large Language Models, a
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/quorum.git
+git clone https://github.com/tap2k/quorum.git
 cd quorum
 ```
 
@@ -85,13 +57,16 @@ npm install
 cp .env.example .env
 ```
 
-4. Add your API keys to `.env`:
+4. Add your API keys to `.env`. You only need keys for the providers whose models you actually plan to use:
 ```env
 ANTHROPIC_API_KEY=your_anthropic_key
 OPENAI_API_KEY=your_openai_key
 GOOGLE_API_KEY=your_google_key
 XAI_API_KEY=your_xai_key
-DEEPINFRA_API_KEY=your_deepinfra_key
+DEEPINFRA_API_KEY=your_deepinfra_key   # gateway for Meta, DeepSeek, Qwen, Moonshot, Zhipu, Gemma, Mistral, GPT-OSS
+
+# Optional
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
 5. Start the development server:
@@ -167,7 +142,7 @@ Edit `lib/llm.js` and add to `modelConfigs`:
 
 ### Temperature Handling
 
-Some models (like GPT-5 series) don't support custom temperature. The system automatically handles this in `lib/llm.js`.
+Reasoning models (OpenAI o-series, GPT-5+, Claude Opus 4.7, and others) don't accept a custom temperature and instead use a `reasoning_effort` parameter. `lib/llm.js` handles these per-model differences automatically — you can leave the temperature slider in the UI and the right thing will happen.
 
 ## Development
 

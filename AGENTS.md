@@ -9,7 +9,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Compare responses from different AI providers side-by-side
 - Customize system prompts for each conversation
 - Synthesize insights from multiple AI responses
-- Support for 25+ models from 8 providers: Anthropic, OpenAI, Google, xAI, Meta, DeepSeek, Qwen, Moonshot, Zhipu AI
+- 80+ models across 10+ providers: Anthropic, OpenAI, Google, xAI, Meta, DeepSeek, Qwen, Moonshot, Zhipu AI, plus open-source (Gemma, Mistral, GPT-OSS, etc.) via DeepInfra
 
 ## Development Commands
 
@@ -25,8 +25,8 @@ Environment variables are configured in `.env` file (see `.env.example` for temp
 - `OPENAI_API_KEY` - OpenAI GPT models access
 - `GOOGLE_API_KEY` - Google Gemini models access
 - `XAI_API_KEY` - xAI Grok models access
-- `DEEPINFRA_API_KEY` - DeepInfra for Meta Llama models
-- `NEXT_PUBLIC_SITE_URL` - Site URL configuration
+- `DEEPINFRA_API_KEY` - DeepInfra gateway for Meta, DeepSeek, Qwen, Moonshot, Zhipu AI, Gemma, Mistral, GPT-OSS, and other open-source models
+- `NEXT_PUBLIC_SITE_URL` - Site URL configuration (optional)
 
 ## Tech Stack
 
@@ -61,25 +61,20 @@ Environment variables are configured in `.env` file (see `.env.example` for temp
 
 ### Supported Models
 
-**Anthropic** - Claude Sonnet 4.5, Haiku 4.5, Sonnet 4, Opus 4.1
+The full registry — including pricing, context windows, provider routing, and per-model quirks — lives in [`lib/llm.js`](lib/llm.js) under `modelConfigs`. Highlights by provider:
 
-**OpenAI** - GPT-5.4, GPT-5.4 Mini, GPT-5.4 Nano (no custom temperature)
+- **Anthropic** — Claude Opus 4.7, Sonnet 4.6, Haiku 4.5 (+ older 4.x and 3.x)
+- **OpenAI** — GPT-5.5, GPT-5.4 (+ Mini/Nano), o3, o4-mini, GPT-4o
+- **Google** — Gemini 3.1 Pro, 3.5 Flash, 3 Flash, 2.5 family
+- **xAI** — Grok 4.3, Grok 4.20 Beta, Grok 4, Grok 4-1 Fast (reasoning + non-reasoning)
+- **Meta** (via DeepInfra) — Llama 4 Maverick, Llama 4 Scout, Llama 3.3 70B
+- **DeepSeek** (via DeepInfra) — V4 Pro/Flash, V3.2 Exp, V3.1 Terminus, R1
+- **Qwen** (via DeepInfra) — Qwen3.5 / Qwen3.6 family (range of sizes)
+- **Moonshot** (via DeepInfra) — Kimi K2.6, K2.5, K2 Instruct
+- **Zhipu AI** (via DeepInfra) — GLM-5.1, GLM-4.7 family, GLM-4.6
+- **Other open-source** (via DeepInfra) — Gemma 3/4, Mistral, Step, Nemotron, MiniMax, GPT-OSS
 
-**Google** - Gemini 2.5 Pro, Flash, Flash Lite
-
-**xAI** - Grok 4, Grok 4 Fast (Reasoning & Non-Reasoning)
-
-**Meta (via DeepInfra)** - Llama 4 Maverick, Llama 4 Scout
-
-**DeepSeek (via DeepInfra)** - V3.2 Exp, V3.1 Terminus, R1
-
-**Qwen (via DeepInfra)** - Qwen3 235B A22B Thinking, Qwen3 Next 80B Thinking & Instruct
-
-**Moonshot (via DeepInfra)** - Kimi K2 Instruct
-
-**Zhipu AI (via DeepInfra)** - GLM-4.6
-
-**Open Source (via DeepInfra)** - GPT-OSS 120B, GPT-OSS 20B
+Reasoning models (o-series, GPT-5+, Opus 4.7, R1, Qwen Thinking, etc.) ignore `temperature` and use `reasoning_effort` instead — `lib/llm.js` handles this per-model.
 
 ## Feature Status
 
@@ -135,30 +130,13 @@ Environment variables are configured in `.env` file (see `.env.example` for temp
 - `systemPrompt` - System instructions
 - `synthesisModel` - Model for synthesis
 
-## Canonical Model Registry
-
-**`lib/llm.js` is the canonical model registry across all projects.** When adding or updating models, update quorum first, then propagate to the other repos. Each repo has a different format and scope:
-
-### Exhaustive (should have all non-legacy quorum models)
-- **whatsupp2** (`~/dev/whatsupp/whatsupp2/hooks/utils.js`) - UX research SaaS platform (AI interviews, simulation, analysis). `modelMap` array with aliases, inputCost/outputCost/maxInputChars
-- **twinning** (`~/dev/whatsupp/twinning/twinexperiments/llm_client.py`) - LLM benchmarking framework for AI persona simulation accuracy. Python `MODEL_MAP` list with inputCost/outputCost/maxChars
-- **redscrape** (`~/dev/whatsupp/redscrape/llm_functions.py`) - AI persona simulation platform grounded in Reddit data. Python `MODEL_MAP` list with shortName/provider/modelName/maxChars
-### Curated (only need latest model per provider/tier)
-- **filer** (`~/dev/filer/llm_functions.py`) - Academic paper analyzer (metadata extraction, clustering, theme identification). Python `MODEL_MAP` list with shortName/provider/modelName/maxChars
-- **redanalyze** (`~/dev/whatsupp/redanalyze/llm_functions.py`) - Reddit/app store scraping and LLM-powered analysis toolkit. Python `MODEL_MAP`, slim ~18 models
-- **uxeai** (`~/dev/whatsupp/uxeai/uxe2/lib/llm.ts`) - AI copilot for querying UX research data via natural language. TypeScript `modelConfigs` object, quorum-like format with cost/color/displayName
-
 ## Development Guidelines
 
-1. **Adding New Models**: Update `modelConfigs` in `lib/llm.js`, then propagate to other repos per the canonical registry section above
+1. **Adding New Models**: Update `modelConfigs` in `lib/llm.js`
 2. **Provider Integration**: Add provider-specific function in `lib/llm.js`
 3. **UI Updates**: Modify `pages/index.js` for interface changes
 4. **Error Handling**: Always include try-catch blocks for API calls
 5. **Testing**: Test with missing API keys and network failures
-
-## Memory Preferences
-
-- **Do not use the auto-memory system** for this project. Do not write any files to `~/.claude/projects/-Users-parikh-dev-quorum/memory/`. If memory files exist there, delete them rather than extending them. Persist anything important here in CLAUDE.md instead.
 
 ## Important Notes
 
