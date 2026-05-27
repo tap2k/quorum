@@ -1,6 +1,6 @@
-# CLAUDE.md
+# Quorum — Agent / Codebase Guide
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides context for AI coding assistants (Claude Code, Cursor, Codex, etc.) and humans working in this repo. `CLAUDE.md` is a pointer to this file.
 
 ## Project Overview
 
@@ -27,6 +27,7 @@ Environment variables are configured in `.env` file (see `.env.example` for temp
 - `XAI_API_KEY` - xAI Grok models access
 - `DEEPINFRA_API_KEY` - DeepInfra gateway for Meta, DeepSeek, Qwen, Moonshot, Zhipu AI, Gemma, Mistral, GPT-OSS, and other open-source models
 - `NEXT_PUBLIC_SITE_URL` - Site URL configuration (optional)
+- `DEBUG_LLM` - When set, logs reasoning/thinking output from models to the server console (optional)
 
 ## Tech Stack
 

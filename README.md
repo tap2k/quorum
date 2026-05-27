@@ -1,6 +1,6 @@
 # Quorum - Multi-LLM Conversation Platform
 
-![Quorum](https://img.shields.io/badge/Next.js-14-black?style=flat-square)
+![Next.js](https://img.shields.io/badge/Next.js-15-black?style=flat-square)
 ![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)
 
 Quorum enables simultaneous conversations with multiple Large Language Models, allowing you to compare responses, synthesize insights, and leverage the strengths of different AI providers in a single interface.
@@ -67,6 +67,7 @@ DEEPINFRA_API_KEY=your_deepinfra_key   # gateway for Meta, DeepSeek, Qwen, Moons
 
 # Optional
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
+DEBUG_LLM=1                   # log reasoning/thinking output to server console
 ```
 
 5. Start the development server:
@@ -114,14 +115,22 @@ Handles all LLM operations:
 ```
 quorum/
 ├── pages/
-│   ├── index.js          # Main UI and conversation logic
+│   ├── index.js              # Main UI and conversation logic
 │   └── api/
-│       └── llm.js        # API endpoint for LLM calls
+│       └── llm.js            # API endpoint for LLM calls
 ├── lib/
-│   └── llm.js           # LLM service and model configurations
+│   └── llm.js                # LLM service and model registry
 ├── styles/
-│   └── globals.css      # Tailwind CSS styles
-└── public/              # Static assets
+│   └── globals.css           # Tailwind CSS styles
+├── public/                   # Static assets
+├── next.config.mjs
+├── eslint.config.mjs
+├── postcss.config.mjs
+├── jsconfig.json
+├── package.json
+├── AGENTS.md                 # Codebase guide (also linked from CLAUDE.md)
+├── LICENSE
+└── README.md
 ```
 
 ## Configuration
