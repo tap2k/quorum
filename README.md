@@ -20,7 +20,7 @@ Quorum enables simultaneous conversations with multiple Large Language Models, a
 
 Quorum currently ships configs for **80+ models across 10+ providers**. A few highlights:
 
-- **Anthropic** — Claude Opus 4.8, Sonnet 4.6, Haiku 4.5
+- **Anthropic** — Claude Fable 5, Mythos 5, Opus 4.8, Sonnet 4.6, Haiku 4.5
 - **OpenAI** — GPT-5.5, GPT-5.4 (+ Mini/Nano), o3, o4-mini
 - **Google** — Gemini 3.1 Pro, 3.5 Flash, 2.5 Pro/Flash
 - **xAI** — Grok 4.3, Grok 4.20 Beta, Grok 4
@@ -151,7 +151,7 @@ Edit `lib/llm.js` and add to `modelConfigs`:
 
 ### Temperature Handling
 
-Reasoning models (OpenAI o-series, GPT-5+, Claude Opus 4.8/4.7, and others) don't accept a custom temperature and instead use a `reasoning_effort` parameter. `lib/llm.js` handles these per-model differences automatically — you can leave the temperature slider in the UI and the right thing will happen.
+Reasoning models (OpenAI o-series, GPT-5+, Claude Fable 5, Mythos 5, Opus 4.8/4.7, and others) don't accept a custom temperature and instead use a `reasoning_effort` parameter. `lib/llm.js` handles these per-model differences automatically — you can leave the temperature slider in the UI and the right thing will happen.
 
 ## Development
 

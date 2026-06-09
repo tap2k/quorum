@@ -64,7 +64,7 @@ Environment variables are configured in `.env` file (see `.env.example` for temp
 
 The full registry — including pricing, context windows, provider routing, and per-model quirks — lives in [`lib/llm.js`](lib/llm.js) under `modelConfigs`. Highlights by provider:
 
-- **Anthropic** — Claude Opus 4.8, Sonnet 4.6, Haiku 4.5 (+ older 4.x and 3.x)
+- **Anthropic** — Claude Fable 5, Mythos 5, Opus 4.8, Sonnet 4.6, Haiku 4.5 (+ older 4.x and 3.x)
 - **OpenAI** — GPT-5.5, GPT-5.4 (+ Mini/Nano), o3, o4-mini, GPT-4o
 - **Google** — Gemini 3.1 Pro, 3.5 Flash, 3 Flash, 2.5 family
 - **xAI** — Grok 4.3, Grok 4.20 Beta, Grok 4, Grok 4-1 Fast (reasoning + non-reasoning)
@@ -75,7 +75,7 @@ The full registry — including pricing, context windows, provider routing, and 
 - **Zhipu AI** (via DeepInfra) — GLM-5.1, GLM-4.7 family, GLM-4.6
 - **Other open-source** (via DeepInfra) — Gemma 3/4, Mistral, Step, Nemotron, MiniMax, GPT-OSS
 
-Reasoning models (o-series, GPT-5+, Opus 4.8/4.7, R1, Qwen Thinking, etc.) ignore `temperature` and use `reasoning_effort` instead — `lib/llm.js` handles this per-model.
+Reasoning models (o-series, GPT-5+, Fable 5, Mythos 5, Opus 4.8/4.7, R1, Qwen Thinking, etc.) ignore `temperature` and use `reasoning_effort` instead — `lib/llm.js` handles this per-model.
 
 ## Feature Status
 
