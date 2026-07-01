@@ -6,6 +6,7 @@ import {
   ArrowDownTrayIcon,
   Cog6ToothIcon,
   TrashIcon,
+  ArrowPathIcon,
   ExclamationCircleIcon,
   ArrowRightIcon,
   KeyIcon
@@ -14,7 +15,7 @@ import {
 export default function Home() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
-  const [selectedModels, setSelectedModels] = useState(['claude-sonnet-4.6', 'gpt-5.4-mini', 'gemini-3-flash']);
+  const [selectedModels, setSelectedModels] = useState(['claude-sonnet-5', 'gpt-5.4-mini', 'gemini-3-flash']);
   const [systemPrompt, setSystemPrompt] = useState('You are a helpful assistant.');
   const [isLoading, setIsLoading] = useState(false);
   const [showSystemPrompt, setShowSystemPrompt] = useState(false);
@@ -65,6 +66,13 @@ export default function Home() {
     const newMessages = [...messages, userMessage];
     setMessages(newMessages);
     setInput('');
+    await runMessages(newMessages);
+  };
+
+  // Query the selected models for the given conversation (ending in a user turn)
+  // and append the assistant response. Shared by send and retry.
+  const runMessages = async (newMessages) => {
+    if (selectedModels.length === 0) return;
     setIsLoading(true);
 
     try {
@@ -184,6 +192,14 @@ export default function Home() {
     if (confirm('Delete this message and all messages after it?')) {
       setMessages(messages.slice(0, index));
     }
+  };
+
+  // Re-run this user message: drop everything after it and re-query the models.
+  const retryFromIndex = (index) => {
+    if (isLoading) return;
+    const truncated = messages.slice(0, index + 1);
+    setMessages(truncated);
+    runMessages(truncated);
   };
 
   const exportConversation = () => {
@@ -462,6 +478,14 @@ export default function Home() {
               <div key={index}>
                 {message.role === 'user' && (
                   <div className="flex justify-end items-start gap-2">
+                    <button
+                      onClick={() => retryFromIndex(index)}
+                      disabled={isLoading}
+                      className="text-xs text-gray-400 hover:text-blue-500 mt-3 disabled:opacity-40 disabled:hover:text-gray-400"
+                      title="Retry this message"
+                    >
+                      <ArrowPathIcon className="w-4 h-4" />
+                    </button>
                     <button
                       onClick={() => deleteFromIndex(index)}
                       className="text-xs text-gray-400 hover:text-red-500 mt-3"
