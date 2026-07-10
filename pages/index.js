@@ -15,7 +15,7 @@ import {
 export default function Home() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
-  const [selectedModels, setSelectedModels] = useState(['claude-sonnet-5', 'gemini-3.5-flash', 'gpt-5.4-mini']);
+  const [selectedModels, setSelectedModels] = useState(['claude-sonnet-5', 'gemini-3.5-flash', 'gpt-5.6-luna']);
   const [systemPrompt, setSystemPrompt] = useState('You are a helpful assistant.');
   const [isLoading, setIsLoading] = useState(false);
   const [showSystemPrompt, setShowSystemPrompt] = useState(false);
