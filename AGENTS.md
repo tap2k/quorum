@@ -65,7 +65,7 @@ Environment variables are configured in `.env` file (see `.env.example` for temp
 The full registry — including pricing, context windows, provider routing, and per-model quirks — lives in [`lib/llm.js`](lib/llm.js) under `modelConfigs`. Highlights by provider:
 
 - **Anthropic** — Claude Fable 5, Mythos 5, Opus 4.8, Sonnet 5, Haiku 4.5 (+ older 4.x and 3.x)
-- **OpenAI** — GPT-5.5, GPT-5.4 (+ Mini/Nano), o3, o4-mini, GPT-4o
+- **OpenAI** — GPT-5.6 (Sol/Terra/Luna), GPT-5.5, GPT-5.4 (+ Mini/Nano), o3, o4-mini, GPT-4o
 - **Google** — Gemini 3.1 Pro, 3.5 Flash, 3 Flash, 2.5 family
 - **xAI** — Grok 4.3, Grok 4.20 Beta, Grok 4, Grok 4-1 Fast (reasoning + non-reasoning)
 - **Meta** (via DeepInfra) — Llama 4 Maverick, Llama 4 Scout, Llama 3.3 70B
