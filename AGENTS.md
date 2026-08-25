@@ -9,7 +9,7 @@ This file provides context for AI coding assistants (Claude Code, Cursor, Codex,
 - Compare responses from different AI providers side-by-side
 - Customize system prompts for each conversation
 - Synthesize insights from multiple AI responses
-- 80+ models across 10+ providers: Anthropic, OpenAI, Google, xAI, Meta, DeepSeek, Qwen, Moonshot, Zhipu AI, plus open-source (Gemma, Mistral, GPT-OSS, etc.) via DeepInfra
+- ~40 current models (100+ including legacy) across 10+ providers: Anthropic, OpenAI, Google, xAI, Meta, DeepSeek, Qwen, Moonshot, Zhipu AI, plus open-source (Gemma, Mistral, GPT-OSS, etc.) via DeepInfra
 
 ## Development Commands
 
@@ -64,18 +64,20 @@ Environment variables are configured in `.env` file (see `.env.example` for temp
 
 The full registry — including pricing, context windows, provider routing, and per-model quirks — lives in [`lib/llm.js`](lib/llm.js) under `modelConfigs`. Highlights by provider:
 
-- **Anthropic** — Claude Fable 5, Mythos 5, Opus 4.8, Sonnet 5, Haiku 4.5 (+ older 4.x and 3.x)
-- **OpenAI** — GPT-5.6 (Sol/Terra/Luna), GPT-5.5, GPT-5.4 (+ Mini/Nano), o3, o4-mini, GPT-4o
-- **Google** — Gemini 3.1 Pro, 3.5 Flash, 3 Flash, 2.5 family
-- **xAI** — Grok 4.5, Grok 4.3, Grok 4.20 Beta, Grok 4-1 Fast (reasoning + non-reasoning)
-- **Meta** (via DeepInfra) — Llama 4 Maverick, Llama 4 Scout, Llama 3.3 70B
-- **DeepSeek** (via DeepInfra) — V4 Pro/Flash, V3.2 Exp, V3.1 Terminus, R1
-- **Qwen** (via DeepInfra) — Qwen3.5 / Qwen3.6 family (range of sizes)
-- **Moonshot** (via DeepInfra) — Kimi K2.6, K2.5, K2 Instruct
-- **Zhipu AI** (via DeepInfra) — GLM-5.1, GLM-4.7 family, GLM-4.6
-- **Other open-source** (via DeepInfra) — Gemma 3/4, Mistral, Step, Nemotron, MiniMax, GPT-OSS
+- **Anthropic** — Claude Fable 5, Mythos 5, Opus 5, Sonnet 5, Haiku 4.5 (+ legacy 4.x and 3.x)
+- **OpenAI** — GPT-5.6 (Sol/Terra/Luna)
+- **Google** — Gemini 3.1 Pro, 3.7 Flash, 3.1 Flash Lite
+- **xAI** — Grok 4.6, Grok 4.1 Fast (reasoning + non-reasoning)
+- **Meta** (via DeepInfra) — Llama 4 Maverick, Llama 4 Scout
+- **DeepSeek** (via DeepInfra) — V4 Pro, V4 Flash
+- **Qwen** (via DeepInfra) — Qwen3.8 2.4T A95B, Qwen3.6 35B A3B, Qwen3.5 122B/27B/9B
+- **Moonshot** (via DeepInfra) — Kimi K3
+- **Zhipu AI** (via DeepInfra) — GLM-5.2, GLM-4.7, GLM-4.7 Flash
+- **Other open-source** (via DeepInfra) — Gemma 4, Mistral, Step 3.7 Flash, Nemotron 3 Nano, MiniMax M3, Hermes 3, GPT-OSS
 
-Reasoning models (o-series, GPT-5+, Fable 5, Mythos 5, Sonnet 5, Opus 4.8/4.7, R1, Qwen Thinking, etc.) ignore `temperature` and use `reasoning_effort` instead — `lib/llm.js` handles this per-model.
+Superseded models stay in `modelConfigs` behind a `legacy: true` flag, hidden from the default picker but still callable. DeepInfra pricing is synced from `https://api.deepinfra.com/v1/openai/models`, which reports live per-million rates.
+
+Reasoning models (GPT-5+, Fable 5, Mythos 5, Opus 5, Sonnet 5, Qwen Thinking, etc.) ignore `temperature` and use `reasoning_effort` instead — `lib/llm.js` handles this per-model.
 
 ## Feature Status
 
@@ -88,7 +90,7 @@ Reasoning models (o-series, GPT-5+, Fable 5, Mythos 5, Sonnet 5, Opus 4.8/4.7, R
 - **Error Handling** - Graceful handling of API failures
 - **Responsive Design** - Mobile-friendly interface
 - **Cost Tracking** - Real-time cost estimation per model and total conversation
-- **Latest Models** - Support for Claude 4, GPT-5, Gemini 2.5, Llama 4, etc.
+- **Latest Models** - Support for Claude 5, GPT-5.6, Gemini 3.x, Grok 4.6, Llama 4, etc.
 - **Smart Parameter Handling** - Automatic handling of model-specific requirements
 
 ### 🚧 Planned Features
