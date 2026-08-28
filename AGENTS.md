@@ -72,7 +72,7 @@ The full registry — including pricing, context windows, provider routing, and 
 - **DeepSeek** (via DeepInfra) — V4 Pro, V4 Flash
 - **Qwen** (via DeepInfra) — Qwen3.8 2.4T A95B, Qwen3.6 35B A3B, Qwen3.5 122B/27B/9B
 - **Moonshot** (via DeepInfra) — Kimi K3
-- **Zhipu AI** (via DeepInfra) — GLM-5.2, GLM-4.7, GLM-4.7 Flash
+- **Zhipu AI** (via DeepInfra) — GLM-5.3 Flash, GLM-5.2, GLM-4.7
 - **Other open-source** (via DeepInfra) — Gemma 4, Mistral, Step 3.7 Flash, Nemotron 3 Nano, MiniMax M3, Hermes 3, GPT-OSS
 
 Superseded models stay in `modelConfigs` behind a `legacy: true` flag, hidden from the default picker but still callable. DeepInfra pricing is synced from `https://api.deepinfra.com/v1/openai/models`, which reports live per-million rates.
