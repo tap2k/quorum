@@ -20,7 +20,7 @@ Quorum enables simultaneous conversations with multiple Large Language Models, a
 
 Quorum currently ships configs for **80+ models across 10+ providers**. A few highlights:
 
-- **Anthropic** — Claude Fable 5, Mythos 5, Opus 4.8, Sonnet 5, Haiku 4.5
+- **Anthropic** — Claude Fable 5.1, Mythos 5, Opus 5, Sonnet 5, Haiku 4.5
 - **OpenAI** — GPT-5.5, GPT-5.4 (+ Mini/Nano), o3, o4-mini
 - **Google** — Gemini 3.1 Pro, 3.5 Flash, 2.5 Pro/Flash
 - **xAI** — Grok 4.3, Grok 4.20 Beta, Grok 4
