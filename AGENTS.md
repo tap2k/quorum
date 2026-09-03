@@ -66,7 +66,7 @@ The full registry — including pricing, context windows, provider routing, and 
 
 - **Anthropic** — Claude Fable 5.1, Mythos 5, Opus 5, Sonnet 5, Haiku 4.5 (+ legacy Fable 5, 4.x and 3.x)
 - **OpenAI** — GPT-5.6 (Sol/Terra/Luna)
-- **Google** — Gemini 3.1 Pro, 3.7 Flash, 3.1 Flash Lite
+- **Google** — Gemini 3.1 Pro, 3.8 Flash, 3.1 Flash Lite
 - **xAI** — Grok 4.6, Grok 4.1 Fast (reasoning + non-reasoning)
 - **Meta** (via DeepInfra) — Llama 4 Maverick, Llama 4 Scout
 - **DeepSeek** (via DeepInfra) — V4 Pro, V4 Flash
