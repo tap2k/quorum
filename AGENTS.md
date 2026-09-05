@@ -65,7 +65,7 @@ Environment variables are configured in `.env` file (see `.env.example` for temp
 The full registry — including pricing, context windows, provider routing, and per-model quirks — lives in [`lib/llm.js`](lib/llm.js) under `modelConfigs`. Highlights by provider:
 
 - **Anthropic** — Claude Fable 5.1, Mythos 5, Opus 5, Sonnet 5, Haiku 4.5 (+ legacy Fable 5, 4.x and 3.x)
-- **OpenAI** — GPT-5.6 (Sol/Terra/Luna)
+- **OpenAI** — GPT-6 Astra, GPT-5.6 (Sol/Terra/Luna)
 - **Google** — Gemini 3.1 Pro, 3.8 Flash, 3.1 Flash Lite
 - **xAI** — Grok 4.6, Grok 4.1 Fast (reasoning + non-reasoning)
 - **Meta** (via DeepInfra) — Llama 4 Maverick, Llama 4 Scout
@@ -90,7 +90,7 @@ Reasoning models (GPT-5+, Fable 5, Mythos 5, Opus 5, Sonnet 5, Qwen Thinking, et
 - **Error Handling** - Graceful handling of API failures
 - **Responsive Design** - Mobile-friendly interface
 - **Cost Tracking** - Real-time cost estimation per model and total conversation
-- **Latest Models** - Support for Claude 5, GPT-5.6, Gemini 3.x, Grok 4.6, Llama 4, etc.
+- **Latest Models** - Support for Claude 5, GPT-6, GPT-5.6, Gemini 3.x, Grok 4.6, Llama 4, etc.
 - **Smart Parameter Handling** - Automatic handling of model-specific requirements
 
 ### 🚧 Planned Features
