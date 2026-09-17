@@ -25,7 +25,7 @@ Quorum currently ships configs for **80+ models across 10+ providers**. A few hi
 - **Google** — Gemini 3.1 Pro, 3.5 Flash, 2.5 Pro/Flash
 - **xAI** — Grok 4.3, Grok 4.20 Beta, Grok 4
 - **Meta** — Llama 4 Maverick, Llama 4 Scout *(via DeepInfra)*
-- **DeepSeek** — V4 Pro/Flash, V3.2 Exp, R1 *(via DeepInfra)*
+- **DeepSeek** — V4 Pro, V4.1 Flash, V3.2 Exp, R1 *(via DeepInfra)*
 - **Qwen** — Qwen3.5 / Qwen3.6 family *(via DeepInfra)*
 - **Moonshot** — Kimi K2.6, K2.5 *(via DeepInfra)*
 - **Zhipu AI** — GLM-5.1, GLM-4.7 *(via DeepInfra)*

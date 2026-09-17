@@ -69,7 +69,7 @@ The full registry — including pricing, context windows, provider routing, and 
 - **Google** — Gemini 3.1 Pro, 3.8 Flash, 3.1 Flash Lite
 - **xAI** — Grok 4.6, Grok 4.1 Fast (reasoning + non-reasoning)
 - **Meta** (via DeepInfra) — Llama 4 Maverick, Llama 4 Scout
-- **DeepSeek** (via DeepInfra) — V4 Pro, V4 Flash
+- **DeepSeek** (via DeepInfra) — V4 Pro, V4.1 Flash
 - **Qwen** (via DeepInfra) — Qwen3.8 2.4T A95B, Qwen3.6 35B A3B, Qwen3.5 122B/27B/9B
 - **Moonshot** (via DeepInfra) — Kimi K3
 - **Zhipu AI** (via DeepInfra) — GLM-5.3, GLM-5.3 Flash, GLM-4.7
