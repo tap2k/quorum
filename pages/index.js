@@ -24,6 +24,9 @@ export default function Home() {
   const [synthesisModel, setSynthesisModel] = useState('gemini-2.5-flash');
   const [showLegacyModels, setShowLegacyModels] = useState(false);
   const [reasoning, setReasoning] = useState('off'); // 'off', 'low', 'medium', 'high'
+  // Panel mode: every model reads the others' replies as prior conversation. Off (default) gives
+  // each model only its own replies — required for interviews, where cross-reading is contamination.
+  const [panelMode, setPanelMode] = useState(false);
   const [apiKeys, setApiKeys] = useState({
     ANTHROPIC_API_KEY: '',
     OPENAI_API_KEY: '',
@@ -76,23 +79,9 @@ export default function Home() {
     setIsLoading(true);
 
     try {
-      // Convert multi-model responses to regular assistant messages
-      const messagesForAPI = newMessages
-        .filter(m => m.role !== 'synthesis')
-        .map(m => {
-          if (m.role === 'assistant' && m.responses) {
-            // Combine all successful responses into a single content field
-            const successfulResponses = m.responses
-              .filter(r => r.success)
-              .map(r => `[${modelConfigs[r.model].displayName}]:\n${r.response}`)
-              .join('\n\n---\n\n');
-            return {
-              role: 'assistant',
-              content: successfulResponses || 'No successful responses'
-            };
-          }
-          return m;
-        });
+      // Send the multi-model turns through intact; callMultipleLLMs gives each model its own
+      // history, so no model reads another's reply as something it said.
+      const messagesForAPI = newMessages.filter(m => m.role !== 'synthesis');
 
       const response = await fetch('/api/llm', {
         method: 'POST',
@@ -104,7 +93,8 @@ export default function Home() {
           temperature,
           systemPrompt,
           apiKeys,
-          reasoning: reasoning !== 'off' ? reasoning : null
+          reasoning: reasoning !== 'off' ? reasoning : null,
+          panelMode
         })
       });
 
@@ -208,6 +198,7 @@ export default function Home() {
       systemPrompt,
       temperature,
       reasoning,
+      panelMode,
       selectedModels,
       synthesisModel,
       exportedAt: new Date().toISOString()
@@ -237,6 +228,7 @@ export default function Home() {
         if (data.systemPrompt) setSystemPrompt(data.systemPrompt);
         if (data.temperature !== undefined) setTemperature(data.temperature);
         if (data.reasoning) setReasoning(data.reasoning);
+        if (data.panelMode !== undefined) setPanelMode(data.panelMode);
         if (data.selectedModels) setSelectedModels(data.selectedModels);
         if (data.synthesisModel) setSynthesisModel(data.synthesisModel);
         alert('Conversation imported successfully!');
@@ -417,6 +409,16 @@ export default function Home() {
                       <option value="medium">Medium</option>
                       <option value="high">High</option>
                     </select>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="text-sm text-gray-600">Panel Mode:</label>
+                    <input
+                      type="checkbox"
+                      checked={panelMode}
+                      onChange={(e) => setPanelMode(e.target.checked)}
+                      className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                      title="On: each model reads the other models' replies as prior conversation. Off: each model sees only its own replies (use for interviews)."
+                    />
                   </div>
                   <div className="flex items-center gap-2">
                     <label className="text-sm text-gray-600">Synthesis Model:</label>

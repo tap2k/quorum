@@ -93,6 +93,8 @@ npm run dev
 ### Customization
 - **System Prompt**: Click "System Prompt" to set custom instructions
 - **Temperature**: Adjust creativity/randomness (0 = focused, 1 = creative)
+- **Reasoning**: Thinking budget for models that support it; the reasoning text is kept and included in exports
+- **Panel Mode**: What each model sees of the previous turns. Off (the default), a model sees only its own earlier replies, so the models never read each other. On, every model reads all of the previous turn's replies, labelled by speaker, as if it had said them. Panel mode is the right setting for a round-table; leave it off when you want independent answers to the same conversation.
 - **Synthesis Model**: Choose which model synthesizes responses
 
 ### Cost Tracking
