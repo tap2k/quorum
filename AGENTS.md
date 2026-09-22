@@ -77,7 +77,7 @@ The full registry — including pricing, context windows, provider routing, and 
 
 Superseded models stay in `modelConfigs` behind a `legacy: true` flag, hidden from the default picker but still callable. DeepInfra pricing is synced from `https://api.deepinfra.com/v1/openai/models`, which reports live per-million rates.
 
-Reasoning models (GPT-5+, Fable 5, Mythos 5, Opus 5, Sonnet 5, Qwen Thinking, etc.) ignore `temperature` and use `reasoning_effort` instead — `lib/llm.js` handles this per-model.
+Reasoning models (GPT-5+, Fable 5, Mythos 5, Opus 5/5.5, Sonnet 5, Qwen Thinking, etc.) ignore `temperature` and use `reasoning_effort` instead — `lib/llm.js` handles this per-model.
 
 ## Feature Status
 
