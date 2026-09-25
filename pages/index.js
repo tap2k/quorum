@@ -556,7 +556,19 @@ export default function Home() {
                             </div>
                             <div className="text-sm text-gray-700">
                               {response.success ? (
-                                <p className="whitespace-pre-wrap">{response.response}</p>
+                                <>
+                                  {response.thinking && (
+                                    <details className="mb-2 rounded border border-purple-200 bg-purple-50">
+                                      <summary className="cursor-pointer px-2 py-1 text-xs text-purple-700 select-none">
+                                        Thinking
+                                      </summary>
+                                      <p className="whitespace-pre-wrap px-2 pb-2 text-xs text-purple-900">
+                                        {response.thinking}
+                                      </p>
+                                    </details>
+                                  )}
+                                  <p className="whitespace-pre-wrap">{response.response}</p>
+                                </>
                               ) : (
                                 <p className="text-red-600 italic">{response.error}</p>
                               )}
