@@ -15,13 +15,13 @@ import {
 export default function Home() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
-  const [selectedModels, setSelectedModels] = useState(['claude-sonnet-5', 'gemini-3.8-flash', 'gpt-5.6-luna']);
+  const [selectedModels, setSelectedModels] = useState(['claude-sonnet-5', 'gemini-3.8-flash', 'gpt-6-luna']);
   const [systemPrompt, setSystemPrompt] = useState('You are a helpful assistant.');
   const [isLoading, setIsLoading] = useState(false);
   const [showSystemPrompt, setShowSystemPrompt] = useState(false);
   const [showApiKeys, setShowApiKeys] = useState(false);
   const [temperature, setTemperature] = useState(0.7);
-  const [synthesisModel, setSynthesisModel] = useState('gemini-2.5-flash');
+  const [synthesisModel, setSynthesisModel] = useState('gemini-3.8-flash');
   const [showLegacyModels, setShowLegacyModels] = useState(false);
   const [reasoning, setReasoning] = useState('off'); // 'off', 'low', 'medium', 'high'
   // Panel mode: every model reads the others' replies as prior conversation. Off (default) gives
