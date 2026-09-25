@@ -74,7 +74,8 @@ export default function Home() {
   };
 
   // Query the selected models for the given conversation (ending in a user turn)
-  // and append the assistant response. Shared by send and retry.
+  // and append the assistant turn, filling each model's card as its reply arrives.
+  // Shared by send and retry.
   const runMessages = async (newMessages) => {
     if (selectedModels.length === 0) return;
     setIsLoading(true);
@@ -84,38 +85,49 @@ export default function Home() {
       // history, so no model reads another's reply as something it said.
       const messagesForAPI = newMessages.filter(m => m.role !== 'synthesis');
 
-      const response = await fetch('/api/llm', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'multi-chat',
-          messages: messagesForAPI,
-          models: selectedModels,
-          temperature,
-          systemPrompt,
-          apiKeys,
-          reasoning: reasoning !== 'off' ? reasoning : null,
-          panelMode
-        })
-      });
+      // One request per model, so a timeout or crash in one request can't discard the others.
+      const queryModel = async (model) => {
+        try {
+          const response = await fetch('/api/llm', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'multi-chat',
+              messages: messagesForAPI,
+              models: [model],
+              temperature,
+              systemPrompt,
+              apiKeys,
+              reasoning: reasoning !== 'off' ? reasoning : null,
+              panelMode
+            })
+          });
+          const data = await response.json().catch(() => ({}));
+          if (!response.ok || !data.responses?.[0]) {
+            throw new Error(data.error || `HTTP error ${response.status}`);
+          }
+          return data.responses[0];
+        } catch (error) {
+          console.error(`Error from ${model}:`, error);
+          return { model, error: error.message, success: false, duration: 0 };
+        }
+      };
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      // The timestamp identifies this turn, so a reply that lands after the turn
+      // was deleted or the conversation replaced is dropped instead of misplaced.
+      const timestamp = new Date().toISOString();
+      setMessages([...newMessages, {
+        role: 'assistant',
+        responses: selectedModels.map(model => ({ model, pending: true })),
+        timestamp
+      }]);
 
-      const data = await response.json();
-
-      if (data.responses) {
-        const assistantMessage = {
-          role: 'assistant',
-          responses: data.responses,
-          timestamp: new Date().toISOString()
-        };
-        setMessages([...newMessages, assistantMessage]);
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      alert('Failed to get responses');
+      await Promise.all(selectedModels.map(async (model) => {
+        const result = await queryModel(model);
+        setMessages(prev => prev.map(m => m.timestamp === timestamp && m.responses
+          ? { ...m, responses: m.responses.map(r => r.model === model ? result : r) }
+          : m));
+      }));
     } finally {
       setIsLoading(false);
     }
@@ -195,7 +207,10 @@ export default function Home() {
 
   const exportConversation = () => {
     const data = {
-      messages,
+      // Drop cards still waiting on a reply
+      messages: messages.map(m => m.responses
+        ? { ...m, responses: m.responses.filter(r => !r.pending) }
+        : m),
       systemPrompt,
       temperature,
       reasoning,
@@ -556,7 +571,7 @@ export default function Home() {
                                     )}
                                   </span>
                                 )}
-                                {!response.success && (
+                                {!response.success && !response.pending && (
                                   <span className="flex items-center gap-1 text-xs text-red-600">
                                     <ExclamationCircleIcon className="w-3 h-3" />
                                     Error
@@ -565,7 +580,9 @@ export default function Home() {
                               </div>
                             </div>
                             <div className="text-sm text-gray-700">
-                              {response.success ? (
+                              {response.pending ? (
+                                <p className="animate-pulse text-gray-400 italic">Waiting…</p>
+                              ) : response.success ? (
                                 <>
                                   {response.thinking && (
                                     <details className="mb-2 rounded border border-purple-200 bg-purple-50">
@@ -656,7 +673,8 @@ export default function Home() {
               </div>
             ))}
 
-            {isLoading && (
+            {/* Model turns show per-card progress; this covers synthesis */}
+            {isLoading && !messages.some(m => m.responses?.some(r => r.pending)) && (
               <div className="flex justify-center">
                 <div className="animate-pulse text-gray-500">Thinking...</div>
               </div>
