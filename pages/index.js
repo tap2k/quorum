@@ -579,7 +579,7 @@ export default function Home() {
                                 )}
                               </div>
                             </div>
-                            <div className="text-sm text-gray-700">
+                            <div className="text-sm text-gray-700" aria-live="polite" aria-busy={!!response.pending}>
                               {response.pending ? (
                                 <p className="animate-pulse text-gray-400 italic">Waiting…</p>
                               ) : response.success ? (
