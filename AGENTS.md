@@ -25,7 +25,8 @@ Environment variables are configured in `.env` file (see `.env.example` for temp
 - `OPENAI_API_KEY` - OpenAI GPT models access
 - `GOOGLE_API_KEY` - Google Gemini models access
 - `XAI_API_KEY` - xAI Grok models access
-- `DEEPINFRA_API_KEY` - DeepInfra gateway for Meta, DeepSeek, Qwen, Moonshot, Zhipu AI, Gemma, Mistral, GPT-OSS, and other open-source models
+- `DEEPINFRA_API_KEY` - DeepInfra gateway for Llama, DeepSeek, Qwen, Moonshot, Zhipu AI, Gemma, Mistral, GPT-OSS, and other open-source models
+- `META_API_KEY` - Meta Model API (Muse series), OpenAI-compatible at `https://api.meta.ai/v1`
 - `NEXT_PUBLIC_SITE_URL` - Site URL configuration (optional)
 - `DEBUG_LLM` - When set, logs reasoning/thinking output from models to the server console (optional)
 
@@ -68,7 +69,7 @@ The full registry — including pricing, context windows, provider routing, and 
 - **OpenAI** — GPT-6 Astra, GPT-6 Sol, GPT-6 Luna, GPT-5.6 Terra
 - **Google** — Gemini 3.1 Pro, 3.8 Flash, 3.1 Flash Lite
 - **xAI** — Grok 4.7, Grok 4.1 Fast (reasoning + non-reasoning)
-- **Meta** (via DeepInfra) — Llama 4 Maverick, Llama 4 Scout
+- **Meta** — Muse Spark 1.3 (direct via Meta Model API); Muse Glimmer 30B, Llama 4 Maverick, Llama 4 Scout (via DeepInfra)
 - **DeepSeek** (via DeepInfra) — V4 Pro, V4.1 Flash
 - **Qwen** (via DeepInfra) — Qwen3.8 2.4T A95B, Qwen3.6 35B A3B, Qwen3.5 122B/27B/9B
 - **Moonshot** (via DeepInfra) — Kimi K3

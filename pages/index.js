@@ -32,7 +32,8 @@ export default function Home() {
     OPENAI_API_KEY: '',
     GOOGLE_API_KEY: '',
     XAI_API_KEY: '',
-    DEEPINFRA_API_KEY: ''
+    DEEPINFRA_API_KEY: '',
+    META_API_KEY: ''
   });
   const messagesEndRef = useRef(null);
 
@@ -360,6 +361,15 @@ export default function Home() {
                       type="password"
                       value={apiKeys.DEEPINFRA_API_KEY}
                       onChange={(e) => updateApiKey('DEEPINFRA_API_KEY', e.target.value)}
+                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-600">Meta (Muse)</label>
+                    <input
+                      type="password"
+                      value={apiKeys.META_API_KEY}
+                      onChange={(e) => updateApiKey('META_API_KEY', e.target.value)}
                       className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
                     />
                   </div>
