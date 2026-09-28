@@ -65,7 +65,7 @@ Environment variables are configured in `.env` file (see `.env.example` for temp
 
 The full registry — including pricing, context windows, provider routing, and per-model quirks — lives in [`lib/llm.js`](lib/llm.js) under `modelConfigs`. Highlights by provider:
 
-- **Anthropic** — Claude Fable 5.1, Mythos 5, Opus 5.5, Sonnet 5, Haiku 4.5 (+ legacy Opus 5, Fable 5, 4.x and 3.x)
+- **Anthropic** — Claude Fable 5.1, Mythos 5, Opus 5.5, Sonnet 5.5, Haiku 4.5 (+ legacy Sonnet 5, Opus 5, Fable 5, 4.x and 3.x)
 - **OpenAI** — GPT-6 Astra, GPT-6 Sol, GPT-6 Luna, GPT-5.6 Terra
 - **Google** — Gemini 3.1 Pro, 3.8 Flash, 3.1 Flash Lite
 - **xAI** — Grok 4.7, Grok 4.1 Fast (reasoning + non-reasoning)
@@ -78,7 +78,7 @@ The full registry — including pricing, context windows, provider routing, and 
 
 Superseded models stay in `modelConfigs` behind a `legacy: true` flag, hidden from the default picker but still callable. DeepInfra pricing is synced from `https://api.deepinfra.com/v1/openai/models`, which reports live per-million rates.
 
-Reasoning models (GPT-5+, Fable 5, Mythos 5, Opus 5/5.5, Sonnet 5, Qwen Thinking, etc.) ignore `temperature` and use `reasoning_effort` instead — `lib/llm.js` handles this per-model.
+Reasoning models (GPT-5+, Fable 5, Mythos 5, Opus 5/5.5, Sonnet 5/5.5, Qwen Thinking, etc.) ignore `temperature` and use `reasoning_effort` instead — `lib/llm.js` handles this per-model.
 
 ## Feature Status
 
