@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import Head from 'next/head';
-import { modelConfigs, getAvailableModels, calculateCost, calculateCostFromUsage } from '@/lib/llm';
+import { modelConfigs, getAvailableModels, calculateCost, calculateCostFromUsage, API_KEY_PROVIDERS } from '@/lib/llm';
 import {
   ArrowDownTrayIcon,
   CloudArrowUpIcon,
@@ -67,13 +67,9 @@ export default function Dialogue() {
   const [isSynthesizing, setIsSynthesizing] = useState(false);
   const [showApiKeys, setShowApiKeys] = useState(false);
   const [showLegacyModels, setShowLegacyModels] = useState(false);
-  const [apiKeys, setApiKeys] = useState({
-    ANTHROPIC_API_KEY: '',
-    OPENAI_API_KEY: '',
-    GOOGLE_API_KEY: '',
-    XAI_API_KEY: '',
-    DEEPINFRA_API_KEY: ''
-  });
+  const [apiKeys, setApiKeys] = useState(
+    Object.fromEntries(API_KEY_PROVIDERS.map(({ envKey }) => [envKey, '']))
+  );
 
   const shouldStopRef = useRef(false);
   const turnsEndRef = useRef(null);
@@ -407,19 +403,13 @@ Be specific — reference actual claims made in the dialogue rather than speakin
               <div className="flex flex-col gap-3">
                 <label className="text-sm font-medium text-gray-700">API Keys (stored locally in browser):</label>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {[
-                    ['ANTHROPIC_API_KEY', 'Anthropic (Claude)'],
-                    ['OPENAI_API_KEY', 'OpenAI (GPT)'],
-                    ['GOOGLE_API_KEY', 'Google (Gemini)'],
-                    ['XAI_API_KEY', 'xAI (Grok)'],
-                    ['DEEPINFRA_API_KEY', 'DeepInfra'],
-                  ].map(([key, label]) => (
-                    <div key={key}>
+                  {API_KEY_PROVIDERS.map(({ envKey, label }) => (
+                    <div key={envKey}>
                       <label className="text-xs text-gray-600">{label}</label>
                       <input
                         type="password"
-                        value={apiKeys[key]}
-                        onChange={(e) => updateApiKey(key, e.target.value)}
+                        value={apiKeys[envKey] || ''}
+                        onChange={(e) => updateApiKey(envKey, e.target.value)}
                         className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
                       />
                     </div>

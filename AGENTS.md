@@ -69,7 +69,7 @@ The full registry — including pricing, context windows, provider routing, and 
 - **OpenAI** — GPT-6 Astra, GPT-6.1 Sol, GPT-6 Luna, GPT-5.6 Terra
 - **Google** — Gemini 3.1 Pro, 3.8 Flash, 3.1 Flash Lite
 - **xAI** — Grok 4.7, Grok 4.1 Fast (reasoning + non-reasoning)
-- **Meta** — Muse Spark 1.3 (direct via Meta Model API); Muse Glimmer 30B, Llama 4 Maverick, Llama 4 Scout (via DeepInfra)
+- **Meta** — Muse Wonder, Muse Spark 1.3 (direct via Meta Model API); Muse Glimmer 30B, Llama 4 Maverick, Llama 4 Scout (via DeepInfra)
 - **DeepSeek** (via DeepInfra) — V4 Pro, V4.1 Flash
 - **Qwen** (via DeepInfra) — Qwen3.8 2.4T A95B, Qwen3.6 35B A3B, Qwen3.5 122B/27B/9B
 - **Moonshot** (via DeepInfra) — Kimi K3

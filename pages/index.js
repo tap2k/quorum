@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import Head from 'next/head';
-import { modelConfigs, getAvailableModels, calculateCost, calculateCostFromUsage, calculateConversationCost, buildInputText, getContextUsage } from '@/lib/llm';
+import { modelConfigs, getAvailableModels, calculateCost, calculateCostFromUsage, calculateConversationCost, buildInputText, getContextUsage, API_KEY_PROVIDERS } from '@/lib/llm';
 import {
   CloudArrowUpIcon,
   ArrowDownTrayIcon,
@@ -27,14 +27,9 @@ export default function Home() {
   // Panel mode: every model reads the others' replies as prior conversation. Off (default) gives
   // each model only its own replies — required for interviews, where cross-reading is contamination.
   const [panelMode, setPanelMode] = useState(false);
-  const [apiKeys, setApiKeys] = useState({
-    ANTHROPIC_API_KEY: '',
-    OPENAI_API_KEY: '',
-    GOOGLE_API_KEY: '',
-    XAI_API_KEY: '',
-    DEEPINFRA_API_KEY: '',
-    META_API_KEY: ''
-  });
+  const [apiKeys, setApiKeys] = useState(
+    Object.fromEntries(API_KEY_PROVIDERS.map(({ envKey }) => [envKey, '']))
+  );
   const messagesEndRef = useRef(null);
 
   // Get models based on legacy setting
@@ -334,60 +329,17 @@ export default function Home() {
                   <label className="text-sm font-medium text-gray-700">API Keys (stored locally in browser):</label>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                  <div>
-                    <label className="text-xs text-gray-600">Anthropic (Claude)</label>
-                    <input
-                      type="password"
-                      value={apiKeys.ANTHROPIC_API_KEY}
-                      onChange={(e) => updateApiKey('ANTHROPIC_API_KEY', e.target.value)}
-                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs text-gray-600">OpenAI (GPT)</label>
-                    <input
-                      type="password"
-                      value={apiKeys.OPENAI_API_KEY}
-                      onChange={(e) => updateApiKey('OPENAI_API_KEY', e.target.value)}
-                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs text-gray-600">Google (Gemini)</label>
-                    <input
-                      type="password"
-                      value={apiKeys.GOOGLE_API_KEY}
-                      onChange={(e) => updateApiKey('GOOGLE_API_KEY', e.target.value)}
-                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs text-gray-600">xAI (Grok)</label>
-                    <input
-                      type="password"
-                      value={apiKeys.XAI_API_KEY}
-                      onChange={(e) => updateApiKey('XAI_API_KEY', e.target.value)}
-                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs text-gray-600">DeepInfra</label>
-                    <input
-                      type="password"
-                      value={apiKeys.DEEPINFRA_API_KEY}
-                      onChange={(e) => updateApiKey('DEEPINFRA_API_KEY', e.target.value)}
-                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs text-gray-600">Meta (Muse)</label>
-                    <input
-                      type="password"
-                      value={apiKeys.META_API_KEY}
-                      onChange={(e) => updateApiKey('META_API_KEY', e.target.value)}
-                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                    />
-                  </div>
+                  {API_KEY_PROVIDERS.map(({ envKey, label }) => (
+                    <div key={envKey}>
+                      <label className="text-xs text-gray-600">{label}</label>
+                      <input
+                        type="password"
+                        value={apiKeys[envKey] || ''}
+                        onChange={(e) => updateApiKey(envKey, e.target.value)}
+                        className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      />
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
