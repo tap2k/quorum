@@ -12,6 +12,8 @@ import {
   KeyIcon
 } from '@heroicons/react/24/outline';
 
+const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+
 export default function Home() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
@@ -27,6 +29,7 @@ export default function Home() {
   // Panel mode: every model reads the others' replies as prior conversation. Off (default) gives
   // each model only its own replies — required for interviews, where cross-reading is contamination.
   const [panelMode, setPanelMode] = useState(false);
+  const [webSearch, setWebSearch] = useState(false);
   const [apiKeys, setApiKeys] = useState(
     Object.fromEntries(PROVIDERS.map(({ envKey }) => [envKey, '']))
   );
@@ -94,7 +97,8 @@ export default function Home() {
               systemPrompt,
               apiKeys,
               reasoning: reasoning !== 'off' ? reasoning : null,
-              panelMode
+              panelMode,
+              webSearch
             })
           });
           const data = await response.json().catch(() => ({}));
@@ -210,6 +214,7 @@ export default function Home() {
       temperature,
       reasoning,
       panelMode,
+      webSearch,
       selectedModels,
       synthesisModel,
       exportedAt: new Date().toISOString()
@@ -240,6 +245,7 @@ export default function Home() {
         if (data.temperature !== undefined) setTemperature(data.temperature);
         if (data.reasoning) setReasoning(data.reasoning);
         if (data.panelMode !== undefined) setPanelMode(data.panelMode);
+        if (data.webSearch !== undefined) setWebSearch(data.webSearch);
         if (data.selectedModels) setSelectedModels(data.selectedModels);
         if (data.synthesisModel) setSynthesisModel(data.synthesisModel);
         alert('Conversation imported successfully!');
@@ -388,6 +394,16 @@ export default function Home() {
                     </select>
                   </div>
                   <div className="flex items-center gap-2">
+                    <label className="text-sm text-gray-600">Web Search:</label>
+                    <input
+                      type="checkbox"
+                      checked={webSearch}
+                      onChange={(e) => setWebSearch(e.target.checked)}
+                      className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                      title={`Let each model use its own provider's web search: ${PROVIDERS.filter(p => p.webSearch).map(p => p.label).join(', ')}. Other models answer without it. Searches are billed per search.`}
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
                     <label className="text-sm text-gray-600">Panel Mode:</label>
                     <input
                       type="checkbox"
@@ -513,6 +529,11 @@ export default function Home() {
                                               +{(response.usage.thinkingTokens / 1000).toFixed(1)}k thinking
                                             </span>
                                           )}
+                                          {response.usage?.searches > 0 && (
+                                            <span className="text-teal-600">
+                                              {plural(response.usage.searches, 'search', 'searches')}
+                                            </span>
+                                          )}
                                         </>
                                       );
                                     })()}
@@ -544,6 +565,29 @@ export default function Home() {
                                       <p className="whitespace-pre-wrap px-2 pb-2 text-xs text-purple-900">
                                         {response.thinking}
                                       </p>
+                                    </details>
+                                  )}
+                                  {response.search && (
+                                    <details className="mb-2 rounded border border-teal-200 bg-teal-50">
+                                      <summary className="cursor-pointer px-2 py-1 text-xs text-teal-700 select-none">
+                                        Searched: {plural(response.search.queries.length, 'query', 'queries')}, {plural(response.search.sources.length, 'source', 'sources')}
+                                      </summary>
+                                      <div className="px-2 pb-2 text-xs text-teal-900">
+                                        {response.search.queries.length > 0 && (
+                                          <ul className="mb-1 list-disc pl-4">
+                                            {response.search.queries.map((q, i) => <li key={i}>{q}</li>)}
+                                          </ul>
+                                        )}
+                                        <ul className="list-disc pl-4">
+                                          {response.search.sources.map(s => (
+                                            <li key={s.url} className="truncate">
+                                              <a href={s.url} target="_blank" rel="noopener noreferrer" className="underline">
+                                                {s.title || s.url}
+                                              </a>
+                                            </li>
+                                          ))}
+                                        </ul>
+                                      </div>
                                     </details>
                                   )}
                                   <p className="whitespace-pre-wrap">{response.response}</p>

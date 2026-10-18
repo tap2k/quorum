@@ -93,6 +93,7 @@ Reasoning models (GPT-5+, Fable 5, Mythos 5, Opus 5/5.5, Sonnet 5/5.5, Haiku 5.5
 - **Cost Tracking** - Real-time cost estimation per model and total conversation
 - **Latest Models** - Support for Claude 5, GPT-6, GPT-5.6, Gemini 3.x, Grok 4.7, Llama 4, etc.
 - **Smart Parameter Handling** - Automatic handling of model-specific requirements
+- **Web Search** - A "Web Search" checkbox in Settings lets each model use its provider's own search tool: Anthropic's server tool, OpenAI and xAI/Meta `web_search` on the Responses API (`callResponses`; xAI and Meta switch to it only when search is on), Gemini `google_search`. DeepInfra models answer without search. Each card shows the search count and a collapsible list of queries and sources; per-search fees (`searchFee` in `PROVIDERS`) are added to the cost. History stays plain text, so follow-up turns search again rather than reusing earlier results (unlike the consumer apps; see `~/dev/convovo/convovo-notes/ai-search/capture-log.md`, "API run"). With search on, Grok's thinking text is not returned.
 
 ### 🚧 Planned Features
 - **API Key Management** - Client-side API tokens with session persistence
