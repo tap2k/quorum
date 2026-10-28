@@ -18,18 +18,18 @@ Quorum enables simultaneous conversations with multiple Large Language Models, a
 
 ## Supported Models
 
-Quorum currently ships configs for **80+ models across 10+ providers**. A few highlights:
+Quorum currently ships configs for **~40 current models (90+ including legacy) across 10+ providers**. A few highlights:
 
-- **Anthropic** — Claude Fable 5.1, Mythos 5, Opus 5, Sonnet 5, Haiku 4.5
-- **OpenAI** — GPT-6 Astra, GPT-5.6 (Sol/Terra/Luna)
-- **Google** — Gemini 4 Argon, 3.1 Pro, 3.5 Flash, 2.5 Pro/Flash
-- **xAI** — Grok 4.3, Grok 4.20 Beta, Grok 4
-- **Meta** — Llama 4 Maverick, Llama 4 Scout *(via DeepInfra)*
-- **DeepSeek** — V4 Pro, V4.1 Flash, V3.2 Exp, R1 *(via DeepInfra)*
-- **Qwen** — Qwen3.5 / Qwen3.6 family *(via DeepInfra)*
-- **Moonshot** — Kimi K2.6, K2.5 *(via DeepInfra)*
-- **Zhipu AI** — GLM-5.1, GLM-4.7 *(via DeepInfra)*
-- **Open source** — Gemma, Mistral, GPT-OSS *(via DeepInfra)*
+- **Anthropic** — Claude Fable 5.1, Mythos 5, Opus 5.5, Sonnet 5.5, Haiku 5.5
+- **OpenAI** — GPT-6 Astra, GPT-6.1 Sol, GPT-6 Luna, GPT-5.6 Terra
+- **Google** — Gemini 4 Argon, 3.1 Pro, 3.8 Flash, 3.5 Flash Lite
+- **xAI** — Grok 4.7
+- **Meta** — Muse Wonder, Muse Spark 1.3; Muse Glimmer 30B, Llama 4 Scout *(via DeepInfra)*
+- **DeepSeek** — V4 Pro, V4.1 Flash *(via DeepInfra)*
+- **Qwen** — Qwen3.6 / Qwen3.5 family *(via DeepInfra)*
+- **Moonshot** — Kimi K3 *(via DeepInfra)*
+- **Zhipu AI** — GLM-5.3, GLM-5.3 Flash, GLM-4.7 *(via DeepInfra)*
+- **Open source** — Gemma 4, Mistral, Nemotron, MiniMax, GPT-OSS *(via DeepInfra)*
 
 The full registry — including pricing, context windows, and provider routing — lives in [`lib/llm.js`](lib/llm.js). To add or update a model, edit `modelConfigs` there.
 
