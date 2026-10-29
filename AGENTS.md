@@ -94,7 +94,7 @@ Reasoning models (GPT-5+, Fable 5, Mythos 5, Opus 5/5.5, Sonnet 5/5.5, Haiku 5.5
 
 ### ✅ Completed Features
 - **Multi-LLM Conversations** - Query multiple models simultaneously
-- **Model Selection UI** - Presets (Current flagships, One per lab, Open weights, Newest wave), a lab filter with one "Smaller open labs" group, and search
+- **Model Selection UI** - A lab filter with one "Smaller open labs" group, search, and Reset (to `DEFAULT_MODELS`) / Clear
 - **System Prompt Configuration** - Customizable system prompts for all models
 - **Temperature Control** - Adjustable temperature parameter (0-1)
 - **Response Synthesis** - AI-powered synthesis of multiple responses
@@ -149,7 +149,7 @@ Reasoning models (GPT-5+, Fable 5, Mythos 5, Opus 5/5.5, Sonnet 5/5.5, Haiku 5.5
 
 1. **Adding New Models**: Update `handWrittenModels` in `lib/llm.js`, then re-run `node scripts/sync-panel.mjs`. Panel models come from modelun; add them there, not here
    - Supersede with `legacy: true`; delete only when the provider no longer serves the id or silently answers with another model. Audit by sending a short request to each id and comparing the response's `model` field (DeepInfra serves `ibm-granite/granite-4.2-30b` as `granite-4.2-8b`, 2026-10-29)
-   - Picker presets and lab groups: `PRESETS` in `pages/index.js`, `LAB_GROUPS` in `lib/llm.js`
+   - Picker default and lab groups: `DEFAULT_MODELS` in `pages/index.js`, `LAB_GROUPS` in `lib/llm.js`
 2. **Provider Integration**: Add provider-specific function in `lib/llm.js`
 3. **UI Updates**: Modify `pages/index.js` for interface changes
 4. **Error Handling**: Always include try-catch blocks for API calls

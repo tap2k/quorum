@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import Head from 'next/head';
-import { modelConfigs, getAvailableModels, labOf, LAB_GROUPS, SMALL_LABS, calculateCost, calculateCostFromUsage, calculateConversationCost, buildInputText, getContextUsage, PROVIDERS } from '@/lib/llm';
+import { modelConfigs, getAvailableModels, LAB_GROUPS, SMALL_LABS, calculateCost, calculateCostFromUsage, calculateConversationCost, buildInputText, getContextUsage, PROVIDERS } from '@/lib/llm';
 import {
   CloudArrowUpIcon,
   ArrowDownTrayIcon,
@@ -16,32 +16,12 @@ const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
 
 const LAB_FILTERS = ['All', ...Object.values(LAB_GROUPS), SMALL_LABS];
 
-// Newest panel model per lab among those passing the test; release is the OpenRouter listing date
-const newestPerLab = (test = () => true) => {
-  const newest = {};
-  for (const [id, c] of Object.entries(modelConfigs)) {
-    if (!c.panel || !c.released || !test(c)) continue;
-    const lab = labOf(c);
-    if (!newest[lab] || c.released > modelConfigs[newest[lab]].released) newest[lab] = id;
-  }
-  return Object.values(newest);
-};
-const newestRelease = Object.values(modelConfigs).filter(c => c.panel && c.released).map(c => c.released).sort().at(-1);
-const monthBefore = new Date(Date.parse(newestRelease) - 30 * 864e5).toISOString().slice(0, 10);
-
-const PRESETS = {
-  // Filtered to ids present, since a panel sync can drop a generated model
-  'Current flagships': ['claude-fable-5.1', 'gpt-6-astra', 'gemini-4-argon', 'grok-4.7', 'muse-wonder-1.0',
-    'deepseek-v4-pro', 'qwen3.8-2.4t-a95b', 'kimi-k3.1-pro', 'glm-5.3', 'mistral-large-4-0'].filter(id => modelConfigs[id]),
-  'One per lab': newestPerLab(),
-  'Open weights': newestPerLab(c => c.open),
-  'Newest wave': Object.keys(modelConfigs).filter(id => modelConfigs[id].panel && modelConfigs[id].released >= monthBefore),
-};
+const DEFAULT_MODELS = ['claude-sonnet-5.5', 'gpt-6.1-sol', 'gemini-3.8-flash', 'grok-4.7', 'muse-spark-1.3', 'deepseek-v4-pro', 'kimi-k3', 'glm-5.3'];
 
 export default function Home() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
-  const [selectedModels, setSelectedModels] = useState(['claude-sonnet-5.5', 'gemini-3.8-flash', 'gpt-6-luna']);
+  const [selectedModels, setSelectedModels] = useState(DEFAULT_MODELS);
   const [systemPrompt, setSystemPrompt] = useState('You are a helpful assistant.');
   const [isLoading, setIsLoading] = useState(false);
   const [showSystemPrompt, setShowSystemPrompt] = useState(false);
@@ -301,11 +281,14 @@ export default function Home() {
             <div className="flex items-center justify-between">
               <h1 className="text-2xl font-bold text-gray-900">Quorum</h1>
               <div className="flex items-center gap-2">
-                {messages.length > 0 && (
-                  <span className="hidden sm:inline text-sm text-gray-600">
-                    Est. Cost: {calculateConversationCost(messages, systemPrompt).formatted}
-                  </span>
-                )}
+                {messages.length > 0 && (() => {
+                  const cost = calculateConversationCost(messages, systemPrompt);
+                  return (
+                    <span className="hidden sm:inline text-sm text-gray-600">
+                      {cost.estimated ? 'Est. Cost' : 'Cost'}: {cost.formatted}
+                    </span>
+                  );
+                })()}
                 {/* Import button */}
                 <label className="cursor-pointer p-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors" title="Import conversation">
                   <input
@@ -471,27 +454,7 @@ export default function Home() {
         {/* Model Selection */}
         <div className="bg-white border-b border-gray-200">
           <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col gap-3">
-            <div className="flex flex-wrap items-center gap-2">
-              {Object.entries(PRESETS).map(([name, ids]) => (
-                <button
-                  key={name}
-                  onClick={() => setSelectedModels(ids)}
-                  className="px-3 py-1 rounded-md text-sm border border-gray-300 text-gray-700 hover:bg-gray-100"
-                  title={ids.map(id => modelConfigs[id].displayName).join(', ')}
-                >
-                  {name} ({ids.length})
-                </button>
-              ))}
-              <input
-                type="search"
-                value={modelSearch}
-                onChange={(e) => setModelSearch(e.target.value)}
-                placeholder="Search models"
-                aria-label="Search models"
-                className="ml-auto px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-              />
-            </div>
-            <div className="flex flex-wrap gap-1">
+            <div className="flex flex-wrap items-center gap-1">
               {LAB_FILTERS.map(group => (
                 <button
                   key={group}
@@ -502,6 +465,14 @@ export default function Home() {
                   {group}
                 </button>
               ))}
+              <input
+                type="search"
+                value={modelSearch}
+                onChange={(e) => setModelSearch(e.target.value)}
+                placeholder="Search models"
+                aria-label="Search models"
+                className="ml-auto px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+              />
             </div>
             <div className="flex flex-wrap gap-2">
               {visibleModels.map(({ id, ...model }) => (
@@ -522,8 +493,7 @@ export default function Home() {
                 </button>
               ))}
             </div>
-            {selectedModels.length > 0 && (
-              <div className="flex flex-wrap items-center gap-1 text-xs text-gray-600">
+            <div className="flex flex-wrap items-center gap-1 text-xs text-gray-600">
                 <span>Selected:</span>
                 {selectedModels.map(id => (
                   <button
@@ -536,11 +506,13 @@ export default function Home() {
                     {modelConfigs[id].displayName} ×
                   </button>
                 ))}
+                <button onClick={() => setSelectedModels(DEFAULT_MODELS)} className="ml-1 underline hover:text-gray-900">
+                  Reset
+                </button>
                 <button onClick={() => setSelectedModels([])} className="ml-1 underline hover:text-gray-900">
                   Clear
                 </button>
               </div>
-            )}
           </div>
         </div>
 
