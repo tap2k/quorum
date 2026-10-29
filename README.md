@@ -18,7 +18,7 @@ Quorum enables simultaneous conversations with multiple Large Language Models, a
 
 ## Supported Models
 
-Quorum currently ships configs for **~40 current models (90+ including legacy) across 10+ providers**. A few highlights:
+Quorum currently ships configs for **~70 current models (140 including legacy) across 25+ labs**, including every runnable model on the [modelun](https://github.com/tap2k/modelun) consensus panel. A few highlights:
 
 - **Anthropic** — Claude Fable 5.1, Mythos 5, Opus 5.5, Sonnet 5.5, Haiku 5.5
 - **OpenAI** — GPT-6 Astra, GPT-6.1 Sol, GPT-6 Luna, GPT-5.6 Terra
@@ -31,7 +31,7 @@ Quorum currently ships configs for **~40 current models (90+ including legacy) a
 - **Zhipu AI** — GLM-5.3, GLM-5.3 Flash, GLM-4.7 *(via DeepInfra)*
 - **Open source** — Gemma 4, Mistral, Nemotron, MiniMax, GPT-OSS *(via DeepInfra)*
 
-The full registry — including pricing, context windows, and provider routing — lives in [`lib/llm.js`](lib/llm.js). To add or update a model, edit `modelConfigs` there.
+Models with a direct provider or DeepInfra route are hand-written in `handWrittenModels` in [`lib/llm.js`](lib/llm.js). The panel models and every model's OpenRouter id are generated into [`lib/panel-models.js`](lib/panel-models.js) by `node scripts/sync-panel.mjs`. A model whose own provider key is not set is called through OpenRouter, and its reply is marked "via OpenRouter".
 
 ## Prerequisites
 
@@ -64,6 +64,7 @@ OPENAI_API_KEY=your_openai_key
 GOOGLE_API_KEY=your_google_key
 XAI_API_KEY=your_xai_key
 DEEPINFRA_API_KEY=your_deepinfra_key   # gateway for Meta, DeepSeek, Qwen, Moonshot, Zhipu, Gemma, Mistral, GPT-OSS
+OPENROUTER_API_KEY=your_openrouter_key # panel models, and fallback for any model whose own key is unset
 
 # Optional
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
@@ -121,7 +122,10 @@ quorum/
 │   └── api/
 │       └── llm.js            # API endpoint for LLM calls
 ├── lib/
-│   └── llm.js                # LLM service and model registry
+│   ├── llm.js                # LLM service and hand-written model registry
+│   └── panel-models.js       # Generated: modelun panel models and OpenRouter ids
+├── scripts/
+│   └── sync-panel.mjs        # Regenerates lib/panel-models.js
 ├── styles/
 │   └── globals.css           # Tailwind CSS styles
 ├── public/                   # Static assets
@@ -139,7 +143,7 @@ quorum/
 
 ### Adding New Models
 
-Edit `lib/llm.js` and add to `modelConfigs`:
+Edit `lib/llm.js` and add to `handWrittenModels`, then re-run `node scripts/sync-panel.mjs` to pick up its OpenRouter id:
 
 ```javascript
 'model-id': {
@@ -200,7 +204,7 @@ MIT License - see LICENSE file for details
 Built with:
 - [Next.js](https://nextjs.org/) - React framework
 - [Tailwind CSS](https://tailwindcss.com/) - Styling
-- Provider APIs: Anthropic, OpenAI, Google, xAI, DeepInfra
+- Provider APIs: Anthropic, OpenAI, Google, xAI, Meta, DeepInfra, OpenRouter
 
 ## Support
 

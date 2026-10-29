@@ -9,7 +9,7 @@ This file provides context for AI coding assistants (Claude Code, Cursor, Codex,
 - Compare responses from different AI providers side-by-side
 - Customize system prompts for each conversation
 - Synthesize insights from multiple AI responses
-- ~40 current models (90+ including legacy) across 10+ providers: Anthropic, OpenAI, Google, xAI, Meta, DeepSeek, Qwen, Moonshot, Zhipu AI, plus open-source (Gemma, Mistral, GPT-OSS, etc.) via DeepInfra
+- ~70 current models (140 including legacy) across 25+ labs: direct (Anthropic, OpenAI, Google, xAI, Meta), DeepInfra-hosted open models, and every runnable modelun consensus-panel model via OpenRouter
 
 ## Development Commands
 
@@ -27,6 +27,7 @@ Environment variables are configured in `.env` file (see `.env.example` for temp
 - `XAI_API_KEY` - xAI Grok models access
 - `DEEPINFRA_API_KEY` - DeepInfra gateway for Llama, DeepSeek, Qwen, Moonshot, Zhipu AI, Gemma, Mistral, GPT-OSS, and other open-source models
 - `META_API_KEY` - Meta Model API (Muse series), OpenAI-compatible at `https://api.meta.ai/v1`
+- `OPENROUTER_API_KEY` - OpenRouter: the panel models without another route, and the fallback for any model whose own provider key is unset
 - `NEXT_PUBLIC_SITE_URL` - Site URL configuration (optional)
 - `DEBUG_LLM` - When set, logs reasoning/thinking output from models to the server console (optional)
 
@@ -48,6 +49,15 @@ Environment variables are configured in `.env` file (see `.env.example` for temp
 - Multi-LLM parallel execution
 - Response synthesis functionality
 
+**lib/panel-models.js** (generated; do not edit)
+- Written by `node scripts/sync-panel.mjs [path/to/modelun]` from modelun's `studies/consensus/spec/models.txt` and `models.json` plus the live OpenRouter catalog
+- Holds the runnable panel models (skips `not_run_after`, `unrunnable`, models missing from OpenRouter, and `host: deepinfra` models without a hand-written entry) and the OpenRouter id of every hand-written model OpenRouter serves
+- Merged into `modelConfigs` over `handWrittenModels`; a hand-written entry wins and gains only `openrouter`, `pin`, `released` and the panel fields (`panel`, `family`, `origin`, `open`)
+- A generated model older than its lab's current hand-written lineup is `legacy`
+- Re-run when modelun's roster changes
+
+**Routing** (`routeFor` in `lib/llm.js`): the model's own provider when its key is set, else OpenRouter under its `openrouter` id with modelun's provider `pin` (`allow_fallbacks: false`). Fallback replies carry `via: 'OpenRouter'`. Web search follows the route, so it is off through OpenRouter.
+
 **pages/api/llm.js**
 - API endpoint for LLM operations
 - Supports single chat, multi-chat, and synthesis actions
@@ -63,7 +73,7 @@ Environment variables are configured in `.env` file (see `.env.example` for temp
 
 ### Supported Models
 
-The full registry — including pricing, context windows, provider routing, and per-model quirks — lives in [`lib/llm.js`](lib/llm.js) under `modelConfigs`. Highlights by provider:
+Hand-written entries (pricing, context windows, provider routing, per-model quirks) live in [`lib/llm.js`](lib/llm.js) under `handWrittenModels`; `modelConfigs` adds the generated panel models. Highlights by provider:
 
 - **Anthropic** — Claude Fable 5.1, Mythos 5, Opus 5.5, Sonnet 5.5, Haiku 5.5 (+ legacy Fable 5, Opus 5, Sonnet 5, Haiku 4.5, Opus 4.5–4.8, Sonnet 4.5–4.6)
 - **OpenAI** — GPT-6 Astra, GPT-6.1 Sol, GPT-6 Luna, GPT-5.6 Terra
@@ -84,7 +94,7 @@ Reasoning models (GPT-5+, Fable 5, Mythos 5, Opus 5/5.5, Sonnet 5/5.5, Haiku 5.5
 
 ### ✅ Completed Features
 - **Multi-LLM Conversations** - Query multiple models simultaneously
-- **Model Selection UI** - Interactive model picker with visual indicators
+- **Model Selection UI** - Presets (Current flagships, One per lab, Open weights, Newest wave), a lab filter with one "Smaller open labs" group, and search
 - **System Prompt Configuration** - Customizable system prompts for all models
 - **Temperature Control** - Adjustable temperature parameter (0-1)
 - **Response Synthesis** - AI-powered synthesis of multiple responses
@@ -137,7 +147,9 @@ Reasoning models (GPT-5+, Fable 5, Mythos 5, Opus 5/5.5, Sonnet 5/5.5, Haiku 5.5
 
 ## Development Guidelines
 
-1. **Adding New Models**: Update `modelConfigs` in `lib/llm.js`
+1. **Adding New Models**: Update `handWrittenModels` in `lib/llm.js`, then re-run `node scripts/sync-panel.mjs`. Panel models come from modelun; add them there, not here
+   - Supersede with `legacy: true`; delete only when the provider no longer serves the id or silently answers with another model. Audit by sending a short request to each id and comparing the response's `model` field (DeepInfra serves `ibm-granite/granite-4.2-30b` as `granite-4.2-8b`, 2026-10-29)
+   - Picker presets and lab groups: `PRESETS` in `pages/index.js`, `LAB_GROUPS` in `lib/llm.js`
 2. **Provider Integration**: Add provider-specific function in `lib/llm.js`
 3. **UI Updates**: Modify `pages/index.js` for interface changes
 4. **Error Handling**: Always include try-catch blocks for API calls

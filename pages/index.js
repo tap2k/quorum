@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import Head from 'next/head';
-import { modelConfigs, getAvailableModels, calculateCost, calculateCostFromUsage, calculateConversationCost, buildInputText, getContextUsage, PROVIDERS } from '@/lib/llm';
+import { modelConfigs, getAvailableModels, labOf, LAB_GROUPS, SMALL_LABS, calculateCost, calculateCostFromUsage, calculateConversationCost, buildInputText, getContextUsage, PROVIDERS } from '@/lib/llm';
 import {
   CloudArrowUpIcon,
   ArrowDownTrayIcon,
@@ -14,6 +14,30 @@ import {
 
 const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
 
+const LAB_FILTERS = ['All', ...Object.values(LAB_GROUPS), SMALL_LABS];
+
+// Newest panel model per lab among those passing the test; release is the OpenRouter listing date
+const newestPerLab = (test = () => true) => {
+  const newest = {};
+  for (const [id, c] of Object.entries(modelConfigs)) {
+    if (!c.panel || !c.released || !test(c)) continue;
+    const lab = labOf(c);
+    if (!newest[lab] || c.released > modelConfigs[newest[lab]].released) newest[lab] = id;
+  }
+  return Object.values(newest);
+};
+const newestRelease = Object.values(modelConfigs).filter(c => c.panel && c.released).map(c => c.released).sort().at(-1);
+const monthBefore = new Date(Date.parse(newestRelease) - 30 * 864e5).toISOString().slice(0, 10);
+
+const PRESETS = {
+  // Filtered to ids present, since a panel sync can drop a generated model
+  'Current flagships': ['claude-fable-5.1', 'gpt-6-astra', 'gemini-4-argon', 'grok-4.7', 'muse-wonder-1.0',
+    'deepseek-v4-pro', 'qwen3.8-2.4t-a95b', 'kimi-k3.1-pro', 'glm-5.3', 'mistral-large-4-0'].filter(id => modelConfigs[id]),
+  'One per lab': newestPerLab(),
+  'Open weights': newestPerLab(c => c.open),
+  'Newest wave': Object.keys(modelConfigs).filter(id => modelConfigs[id].panel && modelConfigs[id].released >= monthBefore),
+};
+
 export default function Home() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
@@ -25,6 +49,8 @@ export default function Home() {
   const [temperature, setTemperature] = useState(0.7);
   const [synthesisModel, setSynthesisModel] = useState('gemini-3.8-flash');
   const [showLegacyModels, setShowLegacyModels] = useState(false);
+  const [labFilter, setLabFilter] = useState('All');
+  const [modelSearch, setModelSearch] = useState('');
   const [reasoning, setReasoning] = useState('off'); // 'off', 'low', 'medium', 'high'
   // Panel mode: every model reads the others' replies as prior conversation. Off (default) gives
   // each model only its own replies — required for interviews, where cross-reading is contamination.
@@ -35,8 +61,10 @@ export default function Home() {
   );
   const messagesEndRef = useRef(null);
 
-  // Get models based on legacy setting
-  const availableModels = getAvailableModels({ includeLegacy: showLegacyModels });
+  const query = modelSearch.trim().toLowerCase();
+  const visibleModels = Object.entries(getAvailableModels({ includeLegacy: showLegacyModels }))
+    .flatMap(([group, models]) => labFilter === 'All' || group === labFilter ? models : [])
+    .filter(m => !query || m.id.includes(query) || m.displayName.toLowerCase().includes(query));
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -442,27 +470,77 @@ export default function Home() {
 
         {/* Model Selection */}
         <div className="bg-white border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 py-4">
-            <div className="flex flex-wrap gap-2">
-              {Object.entries(availableModels).flatMap(([, models]) =>
-                models.map(model => (
-                  <button
-                    key={model.id}
-                    onClick={() => toggleModel(model.id)}
-                    className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${selectedModels.includes(model.id)
-                      ? 'text-white'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                      }`}
-                    style={{
-                      backgroundColor: selectedModels.includes(model.id) ? model.color : undefined
-                    }}
-                    title={model.cost ? `Input: $${model.cost.input.toFixed(2)}/M tokens | Output: $${model.cost.output.toFixed(2)}/M tokens` : 'Cost info not available'}
-                  >
-                    {model.displayName}
-                  </button>
-                ))
-              )}
+          <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col gap-3">
+            <div className="flex flex-wrap items-center gap-2">
+              {Object.entries(PRESETS).map(([name, ids]) => (
+                <button
+                  key={name}
+                  onClick={() => setSelectedModels(ids)}
+                  className="px-3 py-1 rounded-md text-sm border border-gray-300 text-gray-700 hover:bg-gray-100"
+                  title={ids.map(id => modelConfigs[id].displayName).join(', ')}
+                >
+                  {name} ({ids.length})
+                </button>
+              ))}
+              <input
+                type="search"
+                value={modelSearch}
+                onChange={(e) => setModelSearch(e.target.value)}
+                placeholder="Search models"
+                aria-label="Search models"
+                className="ml-auto px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+              />
             </div>
+            <div className="flex flex-wrap gap-1">
+              {LAB_FILTERS.map(group => (
+                <button
+                  key={group}
+                  onClick={() => setLabFilter(group)}
+                  aria-pressed={labFilter === group}
+                  className={`px-2 py-0.5 rounded text-xs ${labFilter === group ? 'bg-gray-800 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
+                >
+                  {group}
+                </button>
+              ))}
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {visibleModels.map(({ id, ...model }) => (
+                <button
+                  key={id}
+                  onClick={() => toggleModel(id)}
+                  aria-pressed={selectedModels.includes(id)}
+                  className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${selectedModels.includes(id)
+                    ? 'text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                  style={{
+                    backgroundColor: selectedModels.includes(id) ? model.color : undefined
+                  }}
+                  title={model.cost ? `Input: $${model.cost.input.toFixed(2)}/M tokens | Output: $${model.cost.output.toFixed(2)}/M tokens` : 'Cost info not available'}
+                >
+                  {model.displayName}
+                </button>
+              ))}
+            </div>
+            {selectedModels.length > 0 && (
+              <div className="flex flex-wrap items-center gap-1 text-xs text-gray-600">
+                <span>Selected:</span>
+                {selectedModels.map(id => (
+                  <button
+                    key={id}
+                    onClick={() => toggleModel(id)}
+                    className="px-2 py-0.5 rounded-full text-white"
+                    style={{ backgroundColor: modelConfigs[id].color }}
+                    aria-label={`Remove ${modelConfigs[id].displayName}`}
+                  >
+                    {modelConfigs[id].displayName} ×
+                  </button>
+                ))}
+                <button onClick={() => setSelectedModels([])} className="ml-1 underline hover:text-gray-900">
+                  Clear
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
@@ -513,6 +591,11 @@ export default function Home() {
                             <div className="flex items-center justify-between mb-2">
                               <h3 className="font-semibold text-sm" style={{ color: config?.color }}>
                                 {config?.displayName}
+                                {response.via && (
+                                  <span className="ml-1 font-normal text-xs text-gray-400" title="The model's own provider key is not set">
+                                    via {response.via}
+                                  </span>
+                                )}
                               </h3>
                               <div className="flex items-center gap-2">
                                 {response.success && config?.cost && (
