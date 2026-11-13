@@ -149,6 +149,8 @@ Reasoning models (GPT-5+, Fable 5, Mythos 5, Opus 5/5.5, Sonnet 5/5.5, Haiku 5.5
 
 1. **Adding New Models**: Update `handWrittenModels` in `lib/llm.js`, then re-run `node scripts/sync-panel.mjs`. Panel models come from modelun; add them there, not here
    - Supersede with `legacy: true`; delete only when the provider no longer serves the id or silently answers with another model. Audit by sending a short request to each id and comparing the response's `model` field (DeepInfra serves `ibm-granite/granite-4.2-30b` as `granite-4.2-8b`, 2026-10-29)
+   - Price and context for DeepInfra models: diff against `curl -H "Authorization: Bearer $DEEPINFRA_API_KEY" https://api.deepinfra.com/v1/openai/models` (`metadata.pricing`, per million; `metadata.context_length`, with `maxChars` = context_length × 4), not the pricing page. Undated ids are rolling aliases.
+   - Leave commented-out code alone. Don't delete or tidy it (a deleted block once took a `*/` with it and disabled live entries)
    - Picker default and lab groups: `DEFAULT_MODELS` in `pages/index.js`, `LAB_GROUPS` in `lib/llm.js`
 2. **Provider Integration**: Add provider-specific function in `lib/llm.js`
 3. **UI Updates**: Modify `pages/index.js` for interface changes
